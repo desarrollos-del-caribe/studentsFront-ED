@@ -49,7 +49,11 @@ jobs:
           debug: true
 
       - name: Eliminar la rama secundaria tras la fusión
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        if: >
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.merged == true &&
+          github.event.pull_request.head.ref != 'main' &&
+          github.event.pull_request.head.ref != 'develop'
         run: |
           git push origin --delete ${{ github.event.pull_request.head.ref }}
         env:
