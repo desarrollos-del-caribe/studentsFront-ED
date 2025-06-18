@@ -1,9 +1,5 @@
-import React from 'react';
-
-interface PlotDisplayProps {
-  src: string;
-  alt: string;
-}
+import React from "react";
+import type { PlotDisplayProps } from "../types/PlotDisplayProps";
 
 const PlotDisplay: React.FC<PlotDisplayProps> = ({ src, alt }) => {
   return (
