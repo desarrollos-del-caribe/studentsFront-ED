@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchLogisticRegression } from '../../services/api';
 import type { LogisticRegressionData } from '../../types/AnalysisData';
+import PlotDisplay from '../PlotDisplay';
 
 const LogisticRegression: React.FC = () => {
   const [data, setData] = useState<LogisticRegressionData | null>(null);
@@ -27,17 +28,23 @@ const LogisticRegression: React.FC = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold">Regresión Logística</h2>
-      <p>Intercepto: {data.intercept.toFixed(2)}</p>
-      <p>Precisión: {data.accuracy.toFixed(2)}</p>
-      <h3 className="mt-4">Coeficientes:</h3>
-      <ul className="list-disc pl-5">
+      <h2 className="text-xl font-semibold mb-4">Regresión Logística</h2>
+      <p><strong>Intercepto:</strong> {data.intercept.toFixed(2)}</p>
+      <p><strong>Precisión:</strong> {data.accuracy.toFixed(2)}</p>
+      <h3 className="mt-4 font-semibold">Coeficientes:</h3>
+      <ul className="list-disc pl-5 mb-4">
         {Object.entries(data.coefficients).map(([key, value]) => (
           <li key={key}>
             {key.replace('coef_', '')}: {value.toFixed(2)}
           </li>
         ))}
       </ul>
+      <h3 className="mt-4 font-semibold">Visualización de la Clasificación:</h3>
+      {data.plot_image ? (
+        <PlotDisplay src={data.plot_image} alt="Gráfico de Regresión Logística" />
+      ) : (
+        <p className="text-gray-500">No hay gráfico disponible</p>
+      )}
     </div>
   );
 };
