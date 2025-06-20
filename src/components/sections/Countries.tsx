@@ -26,30 +26,43 @@ const Countries: React.FC = () => {
   if (error) return <div className="text-center text-red-500">Error: {error}</div>;
   if (!data) return <div className="text-center text-gray-500">No hay datos disponibles</div>;
 
+  // Ordenar países por conteo (Top 10)
+  const sortedCountries = Object.entries(data.country_counts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 10);
+
   return (
     <div className="p-4 bg-white shadow rounded">
       <h2 className="text-xl font-semibold mb-4">Clasificación por Países</h2>
       <p><strong>Número de países únicos:</strong> {data.valid_countries}</p>
       <h3 className="mt-4 font-semibold">Estudiantes por País (Top 10):</h3>
       <ul className="list-disc pl-5 mb-4">
-        {Object.entries(data.country_counts).map(([country, count]) => (
+        {sortedCountries.map(([country, count]) => (
           <li key={country}>
             {country}: {count}
           </li>
         ))}
       </ul>
+      <h3 className="mt-4 font-semibold">Gráfico de Países:</h3>
+      {data.graph ? (
+        <PlotDisplay src={data.graph} alt="Gráfico de Países" />
+      ) : (
+        <p className="text-gray-500">No hay gráfico disponible</p>
+      )}
+      <h3 className="mt-4 font-semibold">Asignación de Clusters por País:</h3>
+      {data.cluster_assignments && Object.keys(data.cluster_assignments).length > 0 ? (
+        <ul className="list-disc pl-5">
+          {Object.entries(data.cluster_assignments).map(([country, cluster]) => (
+            <li key={country}>
+              {country}: Cluster {cluster}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500">No hay asignaciones de clusters disponibles</p>
+      )}
 
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2">Gráfica de Distribución</h3>
-          <div className="border border-gray-200 rounded overflow-auto max-h-[70vh]">
-            <img
-              src={`http://localhost:5000${data.graph}`}
-              alt="Gráfica de países"
-              className="w-full h-auto object-contain"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
-            />
-          </div>
-        </div>
+       
     </div>
   );
 };

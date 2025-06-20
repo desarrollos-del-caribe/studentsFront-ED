@@ -13,7 +13,8 @@ export interface AgeValidationResponse {
 export interface CountryInfo {
   valid_countries: number;
   country_counts: Record<string, number>;
-  graph: string;
+  graph: string; // Cambiado de cluster_image a graph
+  cluster_assignments?: Record<string, number>; // Opcional para manejar ausencia
 }
 
 export interface CountriesResponse {
@@ -114,13 +115,3 @@ export interface DecisionTreeResponse {
   };
 }
 
-export interface AnovaData {
-  f_statistic: number;
-  p_value: number;
-}
-
-export interface AnovaResponse {
-  data: {
-    anova: AnovaData;
-  };
-}
