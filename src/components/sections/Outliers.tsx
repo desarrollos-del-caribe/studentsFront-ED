@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { fetchNullInfo } from '../../services/api';
-import type { NullInfo } from '../../types/AnalysisData';
+import { fetchOutliers } from '../../services/api';
+import type { OutliersData } from '../../types/AnalysisData';
 
-const Cleaning: React.FC = () => {
-  const [data, setData] = useState<NullInfo | null>(null);
+const Outliers: React.FC = () => {
+  const [data, setData] = useState<OutliersData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const nullData = await fetchNullInfo();
-        setData(nullData.data.count);
+        const outliersData = await fetchOutliers();
+        setData(outliersData.data);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
       } finally {
@@ -27,18 +27,10 @@ const Cleaning: React.FC = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold">Limpieza de Datos</h2>
-      <p>Total de datos nulos: {data.total_nulls}</p>
-      <h3 className="mt-4">Datos nulos por columna:</h3>
-      <ul className="list-disc pl-5">
-        {Object.entries(data.null_counts).map(([col, count]) => (
-          <li key={col}>
-            {col}: {count}
-          </li>
-        ))}
-      </ul>
+      <h2 className="text-xl font-semibold">Datos Atípicos</h2>
+      <p>Datos atípicos en uso de redes sociales: {data.outliers}</p>
     </div>
   );
 };
 
-export default Cleaning;
+export default Outliers;

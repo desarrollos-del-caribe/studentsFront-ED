@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { fetchNullInfo } from '../../services/api';
-import type { NullInfo } from '../../types/AnalysisData';
+import { fetchAnova } from '../../services/api';
+import type { AnovaData } from '../../types/AnalysisData';
 
-const Cleaning: React.FC = () => {
-  const [data, setData] = useState<NullInfo | null>(null);
+const Anova: React.FC = () => {
+  const [data, setData] = useState<AnovaData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const nullData = await fetchNullInfo();
-        setData(nullData.data.count);
+        const anovaData = await fetchAnova();
+        setData(anovaData.data.anova);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
       } finally {
@@ -27,18 +27,11 @@ const Cleaning: React.FC = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold">Limpieza de Datos</h2>
-      <p>Total de datos nulos: {data.total_nulls}</p>
-      <h3 className="mt-4">Datos nulos por columna:</h3>
-      <ul className="list-disc pl-5">
-        {Object.entries(data.null_counts).map(([col, count]) => (
-          <li key={col}>
-            {col}: {count}
-          </li>
-        ))}
-      </ul>
+      <h2 className="text-xl font-semibold">Análisis ANOVA</h2>
+      <p>Estadístico F: {data.f_statistic.toFixed(2)}</p>
+      <p>Valor p: {data.p_value.toFixed(4)}</p>
     </div>
   );
 };
 
-export default Cleaning;
+export default Anova;

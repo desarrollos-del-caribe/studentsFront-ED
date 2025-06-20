@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { fetchCountries } from '../../services/api';
-import type { CountriesResponse } from '../../types/AnalysisData';
+import { fetchLinearRegression } from '../../services/api';
+import type { LinearRegressionData } from '../../types/AnalysisData';
 
-const Countries: React.FC = () => {
-  const [data, setData] = useState<CountriesResponse['data']['countries'] | null>(null);
+const LinearRegression: React.FC = () => {
+  const [data, setData] = useState<LinearRegressionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const countryData = await fetchCountries();
-        setData(countryData.data.countries);
+        const regressionData = await fetchLinearRegression();
+        setData(regressionData.data.linear_regression);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
       } finally {
@@ -27,13 +27,14 @@ const Countries: React.FC = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold">Clasificación por Países</h2>
-      <p>Número de países únicos: {data.valid_countries}</p>
-      <h3 className="mt-4">Estudiantes por País (Top 10)</h3>
+      <h2 className="text-xl font-semibold">Regresión Lineal</h2>
+      <p>Intercepto: {data.intercept.toFixed(2)}</p>
+      <p>R² Score: {data.r2_score.toFixed(2)}</p>
+      <h3 className="mt-4">Coeficientes:</h3>
       <ul className="list-disc pl-5">
-        {Object.entries(data.country_counts).map(([country, count]) => (
-          <li key={country}>
-            {country}: {count}
+        {Object.entries(data.coefficients).map(([key, value]) => (
+          <li key={key}>
+            {key.replace('coef_', '')}: {value.toFixed(2)}
           </li>
         ))}
       </ul>
@@ -41,4 +42,4 @@ const Countries: React.FC = () => {
   );
 };
 
-export default Countries;
+export default LinearRegression;

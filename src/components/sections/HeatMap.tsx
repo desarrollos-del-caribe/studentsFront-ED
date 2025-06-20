@@ -1,4 +1,4 @@
-import type { AnalysisData } from "../../types/AnalysisData";
+import type { AnalysisData } from "../../types/Analysis";
 import PlotDisplay from "../PlotDisplay";
 
 const HeatMap: React.FC<{ data: AnalysisData }> = ({ data }) => (

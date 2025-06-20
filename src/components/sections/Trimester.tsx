@@ -1,4 +1,4 @@
-import type { AnalysisData } from "../../types/AnalysisData";
+import type { AnalysisData } from "../../types/Analysis";
 
 const Trimester: React.FC<{ data: AnalysisData }> = ({ data }) => (
   <div className="p-4 bg-white shadow rounded">

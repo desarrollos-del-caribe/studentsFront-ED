@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
+
 class GenericRequest {
-  async Get(url: string) {
+  async Get<T>(url: string): Promise<AxiosResponse<T>> {
     try {
-      const response = await axios.get(
+      const response = await axios.get<T>(
         `${import.meta.env.VITE_URL_API}/${url}`
       );
       return response;
