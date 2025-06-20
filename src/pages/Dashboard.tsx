@@ -10,7 +10,6 @@ import LinearRegression from '../components/sections/LinearRegression';
 import LogisticRegression from '../components/sections/LogisticRegression';
 import Correlation from '../components/sections/Correlation';
 import DecisionTree from '../components/sections/DecisionTree';
-import Anova from '../components/sections/Anova';
 
 const Dashboard: React.FC = () => {
   const [selectedAction, setSelectedAction] = useState<string>('');
@@ -34,7 +33,6 @@ const Dashboard: React.FC = () => {
           {selectedAction === 'logistic_regression' && <LogisticRegression />}
           {selectedAction === 'correlation' && <Correlation />}
           {selectedAction === 'decision_tree' && <DecisionTree />}
-          {selectedAction === 'anova' && <Anova />}
         </div>
       </div>
     </>

@@ -69,6 +69,7 @@ export interface LinearRegressionData {
   coefficients: Record<string, number>;
   intercept: number;
   r2_score: number;
+  plot_image: string;
 }
 
 export interface LinearRegressionResponse {
@@ -81,6 +82,7 @@ export interface LogisticRegressionData {
   coefficients: Record<string, number>;
   intercept: number;
   accuracy: number;
+  plot_image: string;
 }
 
 export interface LogisticRegressionResponse {
@@ -96,6 +98,7 @@ export interface CorrelationData {
 export interface CorrelationResponse {
   data: {
     correlation_matrix: CorrelationData;
+    heatmap_image: string;
   };
 }
 
