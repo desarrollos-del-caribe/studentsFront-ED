@@ -11,6 +11,7 @@ const Countries: React.FC = () => {
     const fetchData = async () => {
       try {
         const countryData = await fetchCountries();
+        console.log(countryData);
         setData(countryData.data.countries);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
@@ -37,6 +38,18 @@ const Countries: React.FC = () => {
           </li>
         ))}
       </ul>
+
+        <div className="mt-6">
+          <h3 className="font-semibold mb-2">Gráfica de Distribución</h3>
+          <div className="border border-gray-200 rounded overflow-auto max-h-[70vh]">
+            <img
+              src={`http://localhost:5000${data.graph}`}
+              alt="Gráfica de países"
+              className="w-full h-auto object-contain"
+              style={{ maxWidth: '100%', maxHeight: '100%' }}
+            />
+          </div>
+        </div>
     </div>
   );
 };

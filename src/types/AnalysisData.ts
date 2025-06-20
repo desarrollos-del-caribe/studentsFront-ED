@@ -13,6 +13,7 @@ export interface AgeValidationResponse {
 export interface CountryInfo {
   valid_countries: number;
   country_counts: Record<string, number>;
+  graph: string;
 }
 
 export interface CountriesResponse {

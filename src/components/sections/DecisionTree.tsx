@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { fetchDecisionTree } from '../../services/api';
 import type { DecisionTreeData } from '../../types/AnalysisData';
+import PlotDisplay from '../PlotDisplay';
 
 const DecisionTree: React.FC = () => {
   const [data, setData] = useState<DecisionTreeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const treeData = await fetchDecisionTree();
-        console.log('Respuesta de la API:', treeData); // Depuración
+        console.log('Respuesta de la API:', treeData);
         setData(treeData.data.decision_tree);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
@@ -23,17 +23,11 @@ const DecisionTree: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleImageError = () => {
-    console.error('Error al cargar la imagen:', data?.tree_image); // Depuración
-    setImageError(true);
-  };
-
   if (loading) return <div className="text-center text-gray-500">Cargando datos...</div>;
   if (error) return <div className="text-center text-red-500">Error: {error}</div>;
-  if (!data) return <div className="text-center text-gray-500">No hay datos disponibles</div>;
-
-  const imageUrl = `${data.tree_image}?t=${new Date().getTime()}`;
-  console.log('Intentando cargar imagen desde:', imageUrl); // Depuración
+  if (!data || !data.tree_image) {
+    return <div className="text-center text-gray-500">No hay imagen del árbol disponible</div>;
+  }
 
   return (
     <div className="p-4 bg-white shadow rounded">
@@ -48,22 +42,7 @@ const DecisionTree: React.FC = () => {
         ))}
       </ul>
       <h3 className="mt-4 font-semibold">Visualización del Árbol:</h3>
-      {imageError ? (
-        <div className="text-center text-red-500">
-          Error al cargar la imagen del árbol. Verifique que el archivo exista en el servidor.
-          <p>URL intentada: {imageUrl}</p>
-        </div>
-      ) : (
-        <div className="overflow-auto max-h-[70vh] border border-gray-200 rounded">
-          <img
-            src={imageUrl}
-            alt="Árbol de Decisión"
-            className="w-full h-auto object-contain"
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
-            onError={handleImageError}
-          />
-        </div>
-      )}
+      <PlotDisplay src={data.tree_image} alt="Visualización del Árbol de Decisión" />
     </div>
   );
 };
