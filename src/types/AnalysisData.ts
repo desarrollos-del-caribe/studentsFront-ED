@@ -13,6 +13,8 @@ export interface AgeValidationResponse {
 export interface CountryInfo {
   valid_countries: number;
   country_counts: Record<string, number>;
+  cluster_image: string;
+  cluster_assignments: Record<string, number>;
 }
 
 export interface CountriesResponse {
@@ -68,6 +70,7 @@ export interface LinearRegressionData {
   coefficients: Record<string, number>;
   intercept: number;
   r2_score: number;
+  plot_image: string;
 }
 
 export interface LinearRegressionResponse {
@@ -80,6 +83,7 @@ export interface LogisticRegressionData {
   coefficients: Record<string, number>;
   intercept: number;
   accuracy: number;
+  plot_image: string;
 }
 
 export interface LogisticRegressionResponse {
@@ -95,6 +99,7 @@ export interface CorrelationData {
 export interface CorrelationResponse {
   data: {
     correlation_matrix: CorrelationData;
+    heatmap_image: string;
   };
 }
 
@@ -107,16 +112,5 @@ export interface DecisionTreeData {
 export interface DecisionTreeResponse {
   data: {
     decision_tree: DecisionTreeData;
-  };
-}
-
-export interface AnovaData {
-  f_statistic: number;
-  p_value: number;
-}
-
-export interface AnovaResponse {
-  data: {
-    anova: AnovaData;
   };
 }

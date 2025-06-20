@@ -11,12 +11,11 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ setSelectedAction }) => {
     { id: 'age', label: 'Validación de Edades' },
     { id: 'countries', label: 'Clasificación por Países' },
     { id: 'outliers', label: 'Datos Atípicos' },
-    { id: 'plots', label: 'Gráficos' },
+    { id: 'plots', label: 'Grafica Uso de Redes Sociales vs Edad' },
     { id: 'linear_regression', label: 'Regresión Lineal' },
     { id: 'logistic_regression', label: 'Regresión Logística' },
     { id: 'correlation', label: 'Matriz de Correlación' },
-    { id: 'decision_tree', label: 'Árbol de Decisión' },
-    { id: 'anova', label: 'Análisis ANOVA' },
+    { id: 'decision_tree', label: 'Árbol de Decisión' }
   ];
 
   return (
