@@ -114,3 +114,4 @@ export interface DecisionTreeResponse {
     decision_tree: DecisionTreeData;
   };
 }
+

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchCountries } from '../../services/api';
 import type { CountriesResponse } from '../../types/AnalysisData';
-import PlotDisplay from '../PlotDisplay';
 
 const Countries: React.FC = () => {
   const [data, setData] = useState<CountriesResponse['data']['countries'] | null>(null);
@@ -12,6 +11,7 @@ const Countries: React.FC = () => {
     const fetchData = async () => {
       try {
         const countryData = await fetchCountries();
+        console.log(countryData);
         setData(countryData.data.countries);
       } catch (err) {
         setError((err as Error).message || 'Error al cargar los datos');
@@ -61,6 +61,8 @@ const Countries: React.FC = () => {
       ) : (
         <p className="text-gray-500">No hay asignaciones de clusters disponibles</p>
       )}
+
+       
     </div>
   );
 };
