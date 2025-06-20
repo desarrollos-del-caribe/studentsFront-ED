@@ -13,8 +13,8 @@ export interface AgeValidationResponse {
 export interface CountryInfo {
   valid_countries: number;
   country_counts: Record<string, number>;
-  cluster_image: string;
-  cluster_assignments: Record<string, number>;
+  graph: string; // Cambiado de cluster_image a graph
+  cluster_assignments?: Record<string, number>; // Opcional para manejar ausencia
 }
 
 export interface CountriesResponse {
