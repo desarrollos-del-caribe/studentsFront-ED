@@ -48,14 +48,15 @@ export interface ScatterDataPoint {
 }
 
 export interface TreeNode {
-  name: string;
-  children?: TreeNode[];
+  label: string;
+  target: string;
+  tree_text: string;
 }
 
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "image" | "tree" | "linear";
-  data: ChartDataPoint[] | ScatterDataPoint[] | TreeNode | string | undefined;
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear";
+  data: ChartDataPoint[] | ScatterDataPoint[] | string;
   width?: number;
   height?: number;
   xAxisLabel?: string;
