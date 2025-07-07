@@ -21,8 +21,6 @@ export function FormPage() {
       try {
         const parsedData = JSON.parse(storedData) as UserFormData;
         return {
-          name: parsedData.name || "",
-          email: parsedData.email || "",
           age: parsedData.age || 20,
           gender: parsedData.gender || "",
           education_level: parsedData.education_level || "",
@@ -40,8 +38,6 @@ export function FormPage() {
     }
     // Datos por defecto si no hay nada en localStorage
     return {
-      name: "",
-      email: "",
       age: 20,
       gender: "",
       education_level: "",
@@ -69,9 +65,7 @@ export function FormPage() {
     const updatedFormData = { ...formData, [field]: value };
     setFormData(updatedFormData);
 
-    // Guardar automáticamente en localStorage cada vez que se actualice un campo
-    localStorage.setItem("userFormData", JSON.stringify(updatedFormData));
-
+    // Solo limpiar errores del campo actual, no guardar en localStorage
     if (errors[field]) {
       const newErrors = { ...errors };
       delete newErrors[field];
@@ -81,16 +75,6 @@ export function FormPage() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    // if (!formData.name.trim()) {
-    //   newErrors.name = "El nombre es requerido";
-    // }
-
-    // if (!formData.email.trim()) {
-    //   newErrors.email = "El email es requerido";
-    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    //   newErrors.email = "Email inválido";
-    // }
 
     if (formData.age < 16 || formData.age > 65) {
       newErrors.age = "Edad debe estar entre 16 y 65 años";
@@ -176,8 +160,6 @@ export function FormPage() {
   // Función para limpiar datos guardados
   const handleClearData = () => {
     const defaultData: UserFormData = {
-      name: "",
-      email: "",
       age: 20,
       gender: "",
       education_level: "",
@@ -191,6 +173,7 @@ export function FormPage() {
 
     setFormData(defaultData);
     localStorage.removeItem("userFormData");
+    localStorage.removeItem("formCompleted");
     setHasExistingData(false);
     setErrors({});
   };
@@ -282,8 +265,8 @@ export function FormPage() {
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <p className="text-blue-600 text-sm">
-                    Puedes modificar cualquier campo y los cambios se guardarán
-                    automáticamente.
+                    Puedes modificar cualquier campo. Los cambios se guardarán
+                    cuando presiones "Guardar y Continuar".
                   </p>
                   <button
                     type="button"

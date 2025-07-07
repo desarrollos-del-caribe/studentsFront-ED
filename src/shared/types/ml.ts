@@ -1,6 +1,4 @@
 export interface UserFormData {
-  name: string;
-  email: string;
   age: number;
   gender: string;
   education_level: string;
