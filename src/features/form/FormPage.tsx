@@ -13,10 +13,12 @@ export function FormPage() {
     age: 20,
     gender: "Masculino",
     education_level: "Universidad",
-    social_media_usage: 3,
-    academic_performance: 75,
+    social_media_usage: 5,
     main_platform: "Instagram",
-    study_hours: 25,
+    sleep_hours_per_night: 8,
+    relationship_status: "Soltero",
+    conflicts_over_social_media: 1,
+    country: "Mexico",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,15 +39,15 @@ export function FormPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "El nombre es requerido";
-    }
+    // if (!formData.name.trim()) {
+    //   newErrors.name = "El nombre es requerido";
+    // }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "El email es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email inválido";
-    }
+    // if (!formData.email.trim()) {
+    //   newErrors.email = "El email es requerido";
+    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    //   newErrors.email = "Email inválido";
+    // }
 
     if (formData.age < 16 || formData.age > 65) {
       newErrors.age = "Edad debe estar entre 16 y 65 años";
@@ -55,15 +57,44 @@ export function FormPage() {
       newErrors.social_media_usage = "Debe estar entre 1 y 10 horas";
     }
 
-    if (formData.study_hours < 0 || formData.study_hours > 80) {
-      newErrors.study_hours = "Debe estar entre 0 y 80 horas semanales";
+    if (
+      formData.age === null ||
+      formData.age === undefined ||
+      isNaN(formData.age) ||
+      formData.age < 1 ||
+      formData.age > 65
+    ) {
+      newErrors.age = "El campo es requerido";
     }
 
     if (
-      formData.academic_performance < 0 ||
-      formData.academic_performance > 100
+      formData.social_media_usage === null ||
+      formData.social_media_usage === undefined ||
+      isNaN(formData.social_media_usage) ||
+      formData.social_media_usage < 1 ||
+      formData.social_media_usage > 10
     ) {
-      newErrors.academic_performance = "Debe estar entre 0 y 100";
+      newErrors.social_media_usage = "El campo es requerido";
+    }
+
+    if (
+      formData.sleep_hours_per_night === null ||
+      formData.sleep_hours_per_night === undefined ||
+      isNaN(formData.sleep_hours_per_night) ||
+      formData.sleep_hours_per_night < 1 ||
+      formData.sleep_hours_per_night > 10
+    ) {
+      newErrors.sleep_hours_per_night = "El campo es requerido";
+    }
+
+    if (
+      formData.conflicts_over_social_media === null ||
+      formData.conflicts_over_social_media === undefined ||
+      isNaN(formData.conflicts_over_social_media) ||
+      formData.conflicts_over_social_media < 0 ||
+      formData.conflicts_over_social_media > 5
+    ) {
+      newErrors.conflicts_over_social_media = "El campo es requerido";
     }
 
     setErrors(newErrors);
@@ -125,7 +156,7 @@ export function FormPage() {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
             {/* Información Personal */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nombre Completo *
                 </label>
@@ -141,9 +172,9 @@ export function FormPage() {
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
                 )}
-              </div>
+              </div> */}
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email *
                 </label>
@@ -159,6 +190,23 @@ export function FormPage() {
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
+              </div> */}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pais *
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={formData.country}
+                  onChange={(e) => handleInputChange("country", e.target.value)}
+                >
+                  {FORM_OPTIONS.country.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -236,10 +284,7 @@ export function FormPage() {
                   ))}
                 </select>
               </div>
-            </div>
 
-            {/* Datos Académicos y de Uso */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Uso Diario de Redes Sociales (horas) *
@@ -269,57 +314,86 @@ export function FormPage() {
                   </p>
                 )}
               </div>
+            </div>
 
+            {/* Datos Académicos y de Uso */}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Horas de Estudio Semanales *
+                  Horas de sueño *
                 </label>
                 <input
                   type="number"
-                  min="0"
-                  max="80"
+                  min="1"
+                  max="10"
+                  step="0.5"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.study_hours ? "border-red-500" : "border-gray-300"
+                    errors.sleep_hours_per_night
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
-                  value={formData.study_hours}
+                  value={formData.sleep_hours_per_night}
                   onChange={(e) =>
-                    handleInputChange("study_hours", parseInt(e.target.value))
+                    handleInputChange(
+                      "sleep_hours_per_night",
+                      parseFloat(e.target.value)
+                    )
                   }
                 />
-                <p className="text-gray-500 text-xs mt-1">Entre 0 y 80 horas</p>
-                {errors.study_hours && (
+                <p className="text-gray-500 text-xs mt-1">Entre 1 y 10 horas</p>
+                {errors.sleep_hours_per_night && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.study_hours}
+                    {errors.sleep_hours_per_night}
                   </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rendimiento Académico Promedio *
+                  Estatus *
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={formData.relationship_status}
+                  onChange={(e) =>
+                    handleInputChange("relationship_status", e.target.value)
+                  }
+                >
+                  {FORM_OPTIONS.relationshipstatus.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Conflictos en redes Sociales *
                 </label>
                 <input
                   type="number"
                   min="0"
-                  max="100"
+                  max="5"
                   step="0.1"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.academic_performance
+                    errors.conflicts_over_social_media
                       ? "border-red-500"
                       : "border-gray-300"
                   }`}
-                  value={formData.academic_performance}
+                  value={formData.conflicts_over_social_media}
                   onChange={(e) =>
                     handleInputChange(
-                      "academic_performance",
+                      "conflicts_over_social_media",
                       parseFloat(e.target.value)
                     )
                   }
                 />
-                <p className="text-gray-500 text-xs mt-1">Escala de 0 a 100</p>
-                {errors.academic_performance && (
+                <p className="text-gray-500 text-xs mt-1">Escala de 0 a 5</p>
+                {errors.conflicts_over_social_media && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.academic_performance}
+                    {errors.conflicts_over_social_media}
                   </p>
                 )}
               </div>
