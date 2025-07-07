@@ -28,10 +28,13 @@ const LinearRegressionChart = ({
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
-        // Destroy existing chart if it exists
         if (chartRef.current) {
           chartRef.current.destroy();
         }
+
+        // Separate user point (with label) from dataset points
+        const userPoint = data.find(point => point.label === 'Tu Predicción');
+        const datasetPoints = data.filter(point => point.label !== 'Tu Predicción');
 
         // Calculate points for regression line
         const xValues = data.map(point => point.x);
@@ -47,12 +50,19 @@ const LinearRegressionChart = ({
           data: {
             datasets: [
               {
-                label: 'Datos',
-                data: data,
+                label: 'Datos del Dataset',
+                data: datasetPoints,
                 backgroundColor: '#2196F3',
                 pointRadius: 5,
                 pointHoverRadius: 7,
               },
+              ...(userPoint ? [{
+                label: 'Tu Predicción',
+                data: [userPoint],
+                backgroundColor: '#FFC107', // Yellow for highlight
+                pointRadius: 8,
+                pointHoverRadius: 10,
+              }] : []),
               {
                 label: 'Línea de Regresión',
                 data: regressionPoints,

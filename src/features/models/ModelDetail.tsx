@@ -82,12 +82,17 @@ export default function ModelDetail() {
                 ];
               const regressionLine =
                 response.regression_line || { slope: -0.3, intercept: 9.0 };
+              const userPoint: ScatterDataPoint = {
+                x: formData?.social_media_usage || 5,
+                y: response.predicted_sleep_hours_per_night,
+                label: "Tu Predicción",
+              };
 
               const visualizations: ModelVisualizationData[] = [
                 {
                   title: "Regresión Lineal: Uso de Redes vs Sueño",
                   type: "linear",
-                  data: scatterPoints,
+                  data: [...scatterPoints, userPoint],
                   regressionLine: regressionLine,
                   width: 600,
                   height: 400,
