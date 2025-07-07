@@ -11,6 +11,7 @@ import {
   LinearRegressionChart,
 } from "./charts";
 import { DecisionTree } from "./charts/DecisionTree";
+import { SVMChart } from "./charts/SVMChart";
 
 interface ModelDataProps {
   visualizations?: ModelVisualizationData[];
@@ -27,6 +28,12 @@ const isScatterData = (
     "y" in data[0] &&
     "cluster" in data[0]
   );
+};
+
+const isLogisticOrSVMData = (
+  data: ChartDataPoint[] | ScatterDataPoint[] | string | { datasetPoints: ChartDataPoint[]; userPoint: { x: number; y: number } }
+): data is { datasetPoints: ChartDataPoint[]; userPoint: { x: number; y: number } } => {
+  return typeof data !== "string" && !Array.isArray(data) && "datasetPoints" in data && "userPoint" in data;
 };
 
 export default function ModelData({
@@ -130,6 +137,21 @@ export default function ModelData({
             title={visualization.title}
           />
         );
+        case "svm":
+          if (!isLogisticOrSVMData(visualization.data)) {
+            return <div>Tipo de datos incompatible para gráfico SVM</div>;
+          }
+          return (
+            <SVMChart
+              key={visualization.title}
+              datasetPoints={visualization.data.datasetPoints}
+              userPoint={visualization.data.userPoint}
+              width={visualization.width || 600}
+              height={visualization.height || 400}
+              xAxisLabel={visualization.xAxisLabel}
+              yAxisLabel={visualization.yAxisLabel}
+            />
+          );
       case "tree":
         if (typeof visualization.data !== "string") {
           return <div>Tipo de datos incompatible para árbol de decisión</div>;
