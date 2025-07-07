@@ -5,6 +5,7 @@ interface ScatterDataPoint {
   x: number;
   y: number;
   cluster: number;
+  label?: string;
 }
 
 interface ScatterPlotProps {
@@ -57,7 +58,20 @@ export function ScatterPlot({
       const colorScale = d3
         .scaleOrdinal<string, string>()
         .domain(clusters.map(String))
-        .range(["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6"]);
+        .range(["#10b981", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6"]);
+
+      // Función para determinar el color del punto
+      const getPointColor = (d: ScatterDataPoint) => {
+        if (d.label === "Tu Predicción") {
+          return "#fbbf24"; // Color dorado para el punto del usuario
+        }
+        return colorScale(String(d.cluster));
+      };
+
+      // Función para determinar el tamaño del punto
+      const getPointSize = (d: ScatterDataPoint) => {
+        return d.label === "Tu Predicción" ? 8 : 5;
+      };
 
       // Crear contenedor principal
       const g = svg
@@ -134,39 +148,40 @@ export function ScatterPlot({
         .enter()
         .append("circle")
         .attr("class", "dot")
-        .attr("r", 5)
+        .attr("r", (d) => getPointSize(d))
         .attr("cx", (d) => xScale(d.x))
         .attr("cy", (d) => yScale(d.y))
-        .style("fill", (d) => colorScale(String(d.cluster)))
+        .style("fill", (d) => getPointColor(d))
         .style("opacity", 0.7)
-        .style("stroke", "white")
-        .style("stroke-width", 1)
+        .style("stroke", (d) =>
+          d.label === "Tu Predicción" ? "#f59e0b" : "white"
+        )
+        .style("stroke-width", (d) => (d.label === "Tu Predicción" ? 3 : 1))
         .style("cursor", "pointer")
-        .on("mouseover", function (_event, d) {
+        .on("mouseover", function (_, d) {
           d3.select(this)
             .transition()
             .duration(100)
-            .attr("r", 7)
+            .attr("r", getPointSize(d) + 2)
             .style("opacity", 1);
 
-          tooltip.style("visibility", "visible").html(`
-            <div>
-              <strong>Cluster:</strong> ${d.cluster}<br/>
-              <strong>${xAxisLabel}:</strong> ${d.x.toFixed(3)}<br/>
-              <strong>${yAxisLabel}:</strong> ${d.y.toFixed(3)}
-            </div>
-          `);
+          const tooltipContent =
+            d.label === "Tu Predicción"
+              ? `<div><strong>${d.label}</strong><br/><strong>Uso de Redes:</strong> ${d.x}h<br/><strong>Horas de Sueño:</strong> ${d.y}h<br/><strong>Clasificación:</strong> ${d.cluster === 0 ? "No Afecta" : "Afecta"}</div>`
+              : `<div><strong>Clasificación:</strong> ${d.cluster === 0 ? "No Afecta" : "Afecta"}<br/><strong>${xAxisLabel}:</strong> ${d.x.toFixed(1)}<br/><strong>${yAxisLabel}:</strong> ${d.y.toFixed(1)}</div>`;
+
+          tooltip.style("visibility", "visible").html(tooltipContent);
         })
         .on("mousemove", function (event) {
           tooltip
             .style("top", event.pageY - 10 + "px")
             .style("left", event.pageX + 10 + "px");
         })
-        .on("mouseout", function () {
+        .on("mouseout", function (_, d) {
           d3.select(this)
             .transition()
             .duration(100)
-            .attr("r", 5)
+            .attr("r", getPointSize(d))
             .style("opacity", 0.7);
 
           tooltip.style("visibility", "hidden");
@@ -177,9 +192,18 @@ export function ScatterPlot({
         .append("g")
         .attr("transform", `translate(${innerWidth + 20}, 20)`);
 
+      // Crear elementos de leyenda para los clusters
+      const legendData = [
+        { cluster: 0, label: "No Afecta", color: "#10b981" },
+        { cluster: 1, label: "Afecta", color: "#ef4444" },
+        ...(data.some((d) => d.label === "Tu Predicción")
+          ? [{ cluster: -1, label: "Tu Predicción", color: "#fbbf24" }]
+          : []),
+      ];
+
       const legendItems = legend
         .selectAll(".legend-item")
-        .data(clusters)
+        .data(legendData)
         .enter()
         .append("g")
         .attr("class", "legend-item")
@@ -187,10 +211,10 @@ export function ScatterPlot({
 
       legendItems
         .append("circle")
-        .attr("r", 6)
-        .style("fill", (d) => colorScale(String(d)))
-        .style("stroke", "white")
-        .style("stroke-width", 1);
+        .attr("r", (d) => (d.cluster === -1 ? 8 : 6))
+        .style("fill", (d) => d.color)
+        .style("stroke", (d) => (d.cluster === -1 ? "#f59e0b" : "white"))
+        .style("stroke-width", (d) => (d.cluster === -1 ? 3 : 1));
 
       legendItems
         .append("text")
@@ -199,7 +223,8 @@ export function ScatterPlot({
         .attr("dy", "0.35em")
         .style("font-size", "12px")
         .style("fill", "#374151")
-        .text((d) => `Cluster ${d}`);
+        .style("font-weight", (d) => (d.cluster === -1 ? "bold" : "normal"))
+        .text((d) => d.label);
 
       // Limpiar tooltip al desmontar
       return () => {

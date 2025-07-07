@@ -42,6 +42,17 @@ interface AcademicResponse {
   risk?: string;
   probability: number;
   graph_url?: string;
+  academic_impact_classification?: string;
+  affects_academic_performance?: number;
+  dataset_points?: Array<{
+    label: number;
+    x: number;
+    y: number;
+  }>;
+  user_point?: {
+    x: number;
+    y: number;
+  };
 }
 
 interface SocialMediaResponse {
@@ -157,21 +168,75 @@ export default function ModelDetail() {
               const visualizations: ModelVisualizationData[] = [];
 
               if (academicImpact) {
-                visualizations.push({
-                  title: "Impacto Académico",
-                  type: "bar",
-                  data: [
-                    {
-                      label: academicImpact.impact || "Sin impacto",
-                      value: academicImpact.probability * 100,
-                      color: "#2196F3",
-                    },
-                  ],
-                  width: 400,
-                  height: 300,
-                  xAxisLabel: "Impacto",
-                  yAxisLabel: "Probabilidad (%)",
-                });
+                // Si hay dataset_points, crear visualización con puntos
+                if (
+                  academicImpact.dataset_points &&
+                  academicImpact.user_point
+                ) {
+                  // Separar puntos por etiqueta
+                  const noAffectsPoints = academicImpact.dataset_points
+                    .filter((point) => point.label === 0)
+                    .map((point) => ({
+                      x: point.x,
+                      y: point.y,
+                      cluster: 0,
+                      label: "No Afecta",
+                    }));
+
+                  const affectsPoints = academicImpact.dataset_points
+                    .filter((point) => point.label === 1)
+                    .map((point) => ({
+                      x: point.x,
+                      y: point.y,
+                      cluster: 1,
+                      label: "Afecta",
+                    }));
+
+                  // Punto del usuario
+                  const userPoint = {
+                    x: academicImpact.user_point.x,
+                    y: academicImpact.user_point.y,
+                    cluster: academicImpact.affects_academic_performance || 0,
+                    label: "Tu Predicción",
+                  };
+
+                  const allPoints = [
+                    ...noAffectsPoints,
+                    ...affectsPoints,
+                    userPoint,
+                  ];
+
+                  visualizations.push({
+                    title: "Regresión Logística: Impacto Académico",
+                    type: "scatter",
+                    data: allPoints,
+                    width: 700,
+                    height: 500,
+                    xAxisLabel: "Horas de Uso de Redes Sociales",
+                    yAxisLabel: "Horas de Sueño por Noche",
+                    description:
+                      academicImpact.academic_impact_classification ||
+                      "Análisis del impacto académico basado en patrones de uso de redes sociales y sueño.",
+                    additionalInfo: `Predicción: ${academicImpact.affects_academic_performance === 0 ? "No afecta tu rendimiento académico" : "Podría afectar tu rendimiento académico"} (${(academicImpact.probability * 100).toFixed(1)}% confianza)`,
+                  });
+                } else {
+                  // Visualización de barras original si no hay dataset_points
+                  visualizations.push({
+                    title: "Impacto Académico",
+                    type: "bar",
+                    data: [
+                      {
+                        label: academicImpact.impact || "Sin impacto",
+                        value: academicImpact.probability * 100,
+                        color: "#2196F3",
+                      },
+                    ],
+                    width: 400,
+                    height: 300,
+                    xAxisLabel: "Impacto",
+                    yAxisLabel: "Probabilidad (%)",
+                  });
+                }
               }
 
               if (academicRisk) {
@@ -191,6 +256,7 @@ export default function ModelDetail() {
                   yAxisLabel: "Probabilidad (%)",
                 });
               }
+
               setVisualizations(visualizations);
             } else {
               setHaveData(false);
