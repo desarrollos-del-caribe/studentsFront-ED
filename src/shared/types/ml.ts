@@ -54,7 +54,10 @@ export interface UserFormData {
     | "Zimbabue"
     | "Otro";
 }
-
+export interface SelectForm{
+  value: string;
+  label: string;
+}
 export interface MLModel {
   id: number;
   name: string;

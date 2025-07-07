@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Save, ArrowRight } from "lucide-react";
 import type { UserFormData } from "../../shared/types/ml";
 import { FORM_OPTIONS } from "../../shared/constants/mlModels";
 import { Button } from "../../shared/components/Button";
-
+import { GetCountry,
+  GetAcademicLevel,
+  GetMostUsedPlatform,
+  GetRelationshipStatus,
+  GetGender } from "../../shared/services/catalogs.services";
+import type {  SelectForm } from "../../shared/types/ml";
 export function FormPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<UserFormData>({
@@ -129,6 +134,33 @@ export function FormPage() {
       setIsSubmitting(false);
     }
   };
+  // Cargar opciones de catálogos
+  const [countries, setCountries] = useState<SelectForm[]>();
+  const [educationLevels, setEducationLevels] = useState<SelectForm[]>();
+  const [mostUsedPlatforms, setMostUsedPlatforms] = useState<SelectForm[]>();
+  const [relationshipStatuses, setRelationshipStatuses] = useState<SelectForm[]>();
+  const [genders, setGenders] = useState<SelectForm[]>();
+  const loadCatalogs = async () => {
+    try {
+      const [countriesData, educationLevelsData, mostUsedPlatformsData, relationshipStatusesData, gendersData] = await Promise.all([
+        GetCountry(),
+        GetAcademicLevel(),
+        GetMostUsedPlatform(),
+        GetRelationshipStatus(),
+        GetGender()
+      ]);
+      setCountries(countriesData);
+      setEducationLevels(educationLevelsData);
+      setMostUsedPlatforms(mostUsedPlatformsData);
+      setRelationshipStatuses(relationshipStatusesData);
+      setGenders(gendersData);
+    } catch (error) {
+      console.error("Error al cargar catálogos:", error);
+    }
+  };
+  useEffect(() => {
+    loadCatalogs();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -201,7 +233,7 @@ export function FormPage() {
                   value={formData.country}
                   onChange={(e) => handleInputChange("country", e.target.value)}
                 >
-                  {FORM_OPTIONS.country.map((option) => (
+                  {countries?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -239,7 +271,7 @@ export function FormPage() {
                   value={formData.gender}
                   onChange={(e) => handleInputChange("gender", e.target.value)}
                 >
-                  {FORM_OPTIONS.genders.map((option) => (
+                  {genders?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -258,7 +290,7 @@ export function FormPage() {
                     handleInputChange("education_level", e.target.value)
                   }
                 >
-                  {FORM_OPTIONS.educationLevels.map((option) => (
+                  {educationLevels?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -277,7 +309,7 @@ export function FormPage() {
                     handleInputChange("main_platform", e.target.value)
                   }
                 >
-                  {FORM_OPTIONS.platforms.map((option) => (
+                  {mostUsedPlatforms?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -360,7 +392,7 @@ export function FormPage() {
                     handleInputChange("relationship_status", e.target.value)
                   }
                 >
-                  {FORM_OPTIONS.relationshipstatus.map((option) => (
+                  {relationshipStatuses?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
