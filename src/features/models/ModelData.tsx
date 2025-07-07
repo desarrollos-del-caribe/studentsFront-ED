@@ -3,14 +3,8 @@ import type {
   ScatterDataPoint,
   ChartDataPoint,
 } from "../../shared/types/ml";
-import {
-  BarChart,
-  LineChart,
-  PieChart,
-  ScatterPlot,
-  
-} from "./charts";
-import LinearRegressionChart from "./charts/LinearRegressionChart";
+import { BarChart, LineChart, PieChart, ScatterPlot } from "./charts";
+import { DecisionTree } from "./charts/DecisionTree";
 
 interface ModelDataProps {
   visualizations?: ModelVisualizationData[];
@@ -18,21 +12,14 @@ interface ModelDataProps {
 }
 
 const isScatterData = (
-  data: ChartDataPoint[] | ScatterDataPoint[],
-  chartType: string
+  data: ChartDataPoint[] | ScatterDataPoint[] | string
 ): data is ScatterDataPoint[] => {
-  if (!Array.isArray(data) || data.length === 0) return false;
-  const hasXY = "x" in data[0] && "y" in data[0];
-  // For 'scatter' type (K-Means), require 'cluster'; for 'linear', it's optional
-  const hasCluster = "cluster" in data[0];
-  return chartType === "linear" ? hasXY : hasXY && hasCluster;
-};
-
-// Función helper para verificar si es K-Means
-const isKMeansCluster = (title: string): boolean => {
   return (
-    title.toLowerCase().includes("cluster") ||
-    title.toLowerCase().includes("k-means")
+    typeof data !== "string" &&
+    data.length > 0 &&
+    "x" in data[0] &&
+    "y" in data[0] &&
+    "cluster" in data[0]
   );
 };
 
@@ -41,10 +28,12 @@ export default function ModelData({
   title = "Datos del Modelo",
 }: ModelDataProps) {
   const renderChart = (visualization: ModelVisualizationData) => {
-    console.log("Rendering chart for visualization:", visualization);
     switch (visualization.type) {
       case "bar":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (
+          typeof visualization.data === "string" ||
+          isScatterData(visualization.data)
+        ) {
           return <div>Tipo de datos incompatible para gráfico de barras</div>;
         }
         return (
@@ -58,7 +47,10 @@ export default function ModelData({
           />
         );
       case "line":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (
+          typeof visualization.data === "string" ||
+          isScatterData(visualization.data)
+        ) {
           return <div>Tipo de datos incompatible para gráfico de líneas</div>;
         }
         return (
@@ -72,7 +64,10 @@ export default function ModelData({
           />
         );
       case "pie":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (
+          typeof visualization.data === "string" ||
+          isScatterData(visualization.data)
+        ) {
           return <div>Tipo de datos incompatible para gráfico circular</div>;
         }
         return (
@@ -84,13 +79,20 @@ export default function ModelData({
           />
         );
       case "scatter":
-        if (!isScatterData(visualization.data, visualization.type)) {
+        console.log("Rendering scatter plot with data:", visualization);
+        if (
+          typeof visualization.data === "string" ||
+          !isScatterData(visualization.data)
+        ) {
           return <div>Tipo de datos incompatible para scatter plot</div>;
         }
         return (
           <ScatterPlot
             key={visualization.title}
-            data={visualization.data}
+            data={visualization.data.map((point) => ({
+              ...point,
+              cluster: point.cluster ?? 0,
+            }))}
             width={visualization.width || 600}
             height={visualization.height || 400}
             xAxisLabel={visualization.xAxisLabel}
@@ -98,24 +100,16 @@ export default function ModelData({
             title={visualization.title}
           />
         );
-      case "linear":
-        if (!isScatterData(visualization.data, visualization.type) || !visualization.regressionLine) {
-          return <div>Tipo de datos incompatible para gráfico de regresión lineal</div>;
+      case "tree":
+        if (typeof visualization.data !== "string") {
+          return <div>Tipo de datos incompatible para árbol de decisión</div>;
         }
-        return (
-          <LinearRegressionChart
-            key={visualization.title}
-            data={visualization.data}
-            regressionLine={visualization.regressionLine}
-            width={visualization.width || 600}
-            height={visualization.height || 400}
-            xAxisLabel={visualization.xAxisLabel}
-            yAxisLabel={visualization.yAxisLabel}
-            title={visualization.title}
-          />
-        );
+        return <DecisionTree treeText={visualization.data} />;
       case "histogram":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (
+          typeof visualization.data === "string" ||
+          isScatterData(visualization.data)
+        ) {
           return <div>Tipo de datos incompatible para histograma</div>;
         }
         return (
@@ -129,7 +123,10 @@ export default function ModelData({
           />
         );
       default:
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (
+          typeof visualization.data === "string" ||
+          isScatterData(visualization.data)
+        ) {
           return <div>Tipo de gráfico no soportado</div>;
         }
         return (
@@ -145,23 +142,10 @@ export default function ModelData({
     }
   };
 
-  if (visualizations.length === 0) {
-    return (
-      <div className="p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">{title}</h2>
-        <div className="text-center py-8">
-          <p className="text-gray-500 text-lg">No hay datos para mostrar</p>
-          <p className="text-gray-400 text-sm mt-2">
-            Pasa datos de visualización al componente para ver gráficos
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
+
       <div className="grid gap-6">
         {visualizations.map((visualization, index) => (
           <div key={index} className="bg-gray-50 p-4 rounded-lg">

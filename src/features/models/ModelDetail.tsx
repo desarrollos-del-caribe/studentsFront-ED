@@ -10,6 +10,7 @@ import type {
   UserFormData,
   ModelVisualizationData,
   ScatterDataPoint,
+  TreeNode,
 } from "../../shared/types/ml";
 
 interface KMeansResponse {
@@ -183,23 +184,7 @@ export default function ModelDetail() {
                 {
                   title: "Distribución de Clusters",
                   type: "scatter",
-                  data:
-                    kmeanResponse.points ||
-                    ([
-                      // Datos de muestra con coordenadas 3D
-                      { x: 2.5, y: 3.1, z: 1.8, cluster: 0 },
-                      { x: 1.8, y: 2.9, z: 2.2, cluster: 0 },
-                      { x: 2.2, y: 3.3, z: 1.5, cluster: 0 },
-                      { x: 5.1, y: 4.8, z: 3.9, cluster: 1 },
-                      { x: 4.9, y: 5.2, z: 4.1, cluster: 1 },
-                      { x: 5.3, y: 4.6, z: 3.7, cluster: 1 },
-                      { x: 8.2, y: 1.1, z: 6.8, cluster: 2 },
-                      { x: 7.9, y: 1.4, z: 6.5, cluster: 2 },
-                      { x: 8.5, y: 0.9, z: 7.1, cluster: 2 },
-                      { x: 3.1, y: 6.8, z: 2.9, cluster: 3 },
-                      { x: 2.8, y: 7.1, z: 3.2, cluster: 3 },
-                      { x: 3.4, y: 6.5, z: 2.7, cluster: 3 },
-                    ] as ScatterDataPoint[]),
+                  data: kmeanResponse.points,
                   width: 800,
                   height: 600,
                   xAxisLabel: "Componente Principal 1",
@@ -257,9 +242,20 @@ export default function ModelDetail() {
               ? await Models.GetTreeVisualizationPrediction(formData)
               : undefined;
 
-            if (response) {
+            const responseCast = response as TreeNode | undefined;
+
+            if (response && responseCast?.tree_text) {
               setHaveData(true);
-              console.log("Tree Visualization:", response);
+              const treeVisualizations: ModelVisualizationData[] = [
+                {
+                  title: "Árbol de Decisión",
+                  type: "tree",
+                  data: responseCast.tree_text,
+                  width: 800,
+                  height: 600,
+                },
+              ];
+              setVisualizations(treeVisualizations);
             } else {
               setHaveData(false);
             }
