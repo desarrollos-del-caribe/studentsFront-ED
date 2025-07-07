@@ -3,11 +3,17 @@ export interface User {
   name: string;
   email: string;
   age: number;
-  gender: 'Masculino' | 'Femenino' | 'Otro';
-  education_level: 'Bachillerato' | 'Universidad' | 'Posgrado';
+  gender: "Masculino" | "Femenino" | "Otro";
+  education_level: "Bachillerato" | "Universidad" | "Posgrado";
   social_media_usage: number; // 1-10 hours per day
   academic_performance: number; // 0-100
-  main_platform: 'Instagram' | 'TikTok' | 'Facebook' | 'Twitter' | 'YouTube' | 'LinkedIn';
+  main_platform:
+    | "Instagram"
+    | "TikTok"
+    | "Facebook"
+    | "Twitter"
+    | "YouTube"
+    | "LinkedIn";
   study_hours: number; // hours per week
   created_at: string;
 }
@@ -16,8 +22,8 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   age: number;
-  gender: 'Masculino' | 'Femenino' | 'Otro';
-  education_level: 'Bachillerato' | 'Universidad' | 'Posgrado';
+  gender: "Masculino" | "Femenino" | "Otro";
+  education_level: "Bachillerato" | "Universidad" | "Posgrado";
   social_media_usage?: number;
   academic_performance?: number;
   main_platform?: string;
@@ -28,12 +34,57 @@ export interface UserFormData {
   name: string;
   email: string;
   age: number;
-  gender: 'Masculino' | 'Femenino' | 'Otro';
-  education_level: 'Bachillerato' | 'Universidad' | 'Posgrado';
+  gender: "Masculino" | "Femenino" | "Otro";
+  education_level: "Bachillerato" | "Universidad" | "Posgrado";
   social_media_usage: number;
-  academic_performance: number;
-  main_platform: 'Instagram' | 'TikTok' | 'Facebook' | 'Twitter' | 'YouTube' | 'LinkedIn';
-  study_hours: number;
+  main_platform:
+    | "Instagram"
+    | "TikTok"
+    | "Facebook"
+    | "Twitter"
+    | "YouTube"
+    | "LinkedIn";
+  sleep_hours_per_night: number;
+  relationship_status: "Soltero" | "En una relacion" | "Casado" | "Complicado";
+  conflicts_over_social_media: number;
+  country:
+    | "Afghanistan"
+    | "Albania"
+    | "Algeria"
+    | "Antigua y Barbuda"
+    | "Argentina"
+    | "Armenia"
+    | "Austria"
+    | "Bahrain"
+    | "Bangladesh"
+    | "Belize"
+    | "Bhutan"
+    | "Bolivia"
+    | "Brazil"
+    | "Canada"
+    | "Chile"
+    | "China"
+    | "Colombia"
+    | "Ecuador"
+    | "El salvador"
+    | "España"
+    | "Estados Unidos"
+    | "Germany"
+    | "Guatemala"
+    | "India"
+    | "Italy"
+    | "Japan"
+    | "Liechtenstein"
+    | "Malta"
+    | "Mexico"
+    | "North Korea"
+    | "Peru"
+    | "Qatar"
+    | "Ukraine"
+    | "Venezuela"
+    | "Vietnam"
+    | "Zimbabue"
+    | "Otro";
 }
 
 export interface MLModel {
@@ -50,7 +101,7 @@ export interface MLModel {
 }
 
 export interface MLAnalysisResult {
-  status: 'success' | 'error';
+  status: "success" | "error";
   model_id: string;
   user_id: string;
   timestamp: string;
