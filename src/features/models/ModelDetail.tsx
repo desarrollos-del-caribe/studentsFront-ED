@@ -45,7 +45,16 @@ interface AcademicResponse {
 }
 
 interface SocialMediaResponse {
-  probabilities: number[];
+  probabilities: {
+    Adicción: number;
+    "No adicción": number;
+  };
+  risk: string;
+  graph_data?: {
+    label: string;
+    x: string[];
+    y: number[];
+  };
   graph_url?: string;
 }
 import ModelData from "./ModelData";
@@ -238,24 +247,26 @@ export default function ModelDetail() {
             if (socialMediaResponse) {
               setHaveData(true);
               console.log("Social Media Addiction Risk:", socialMediaResponse);
+
+              // Crear visualización basada en los datos de probabilidades
+              const addictionProbability =
+                socialMediaResponse.probabilities["Adicción"] * 100;
+              const noAddictionProbability =
+                socialMediaResponse.probabilities["No adicción"] * 100;
+
               const visualizations: ModelVisualizationData[] = [
                 {
-                  title: "Riesgo de Adicción a Redes Sociales",
+                  title: `Riesgo de Adicción a Redes Sociales - Nivel: ${socialMediaResponse.risk}`,
                   type: "pie",
                   data: [
                     {
-                      label: "Bajo",
-                      value: socialMediaResponse.probabilities[0] * 100,
+                      label: "No Adicción",
+                      value: noAddictionProbability,
                       color: "#4CAF50",
                     },
                     {
-                      label: "Medio",
-                      value: socialMediaResponse.probabilities[1] * 100,
-                      color: "#FFC107",
-                    },
-                    {
-                      label: "Alto",
-                      value: socialMediaResponse.probabilities[2] * 100,
+                      label: "Adicción",
+                      value: addictionProbability,
                       color: "#F44336",
                     },
                   ],
@@ -263,8 +274,30 @@ export default function ModelDetail() {
                   height: 300,
                   xAxisLabel: "Nivel de Riesgo",
                   yAxisLabel: "Probabilidad (%)",
+                  description: `Basado en tus datos, el modelo predice un riesgo ${socialMediaResponse.risk.toLowerCase()} de adicción a redes sociales.`,
+                  additionalInfo: `Probabilidad de No Adicción: ${noAddictionProbability.toFixed(1)}% | Probabilidad de Adicción: ${addictionProbability.toFixed(1)}%`,
                 },
               ];
+
+              // Si hay datos de gráfico adicionales, agregar una visualización de barras
+              if (socialMediaResponse.graph_data) {
+                visualizations.push({
+                  title: socialMediaResponse.graph_data.label,
+                  type: "bar",
+                  data: socialMediaResponse.graph_data.x.map(
+                    (label, index) => ({
+                      label,
+                      value: socialMediaResponse.graph_data!.y[index] * 100,
+                      color: label === "Adicción" ? "#F44336" : "#4CAF50",
+                    })
+                  ),
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Categoría",
+                  yAxisLabel: "Probabilidad (%)",
+                });
+              }
+
               setVisualizations(visualizations);
             } else {
               setHaveData(false);

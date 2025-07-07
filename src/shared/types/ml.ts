@@ -62,7 +62,8 @@ export interface ModelVisualizationData {
   xAxisLabel?: string;
   yAxisLabel?: string;
   regressionLine?: { slope: number; intercept: number };
-
+  description?: string;
+  additionalInfo?: string;
 }
 
 export interface ModelMetrics {
