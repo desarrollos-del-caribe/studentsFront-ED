@@ -13,28 +13,65 @@ import {
 import type { SelectForm } from "../../shared/types/ml";
 export function FormPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<UserFormData>({
-    name: "",
-    email: "",
-    age: 20,
-    gender: "",
-    education_level: "",
-    social_media_usage: 5,
-    main_platform: "",
-    sleep_hours_per_night: 8,
-    relationship_status: "",
-    conflicts_over_social_media: 1,
-    country: "",
-  });
+
+  // Función para cargar datos del localStorage
+  const loadFormDataFromStorage = (): UserFormData => {
+    const storedData = localStorage.getItem("userFormData");
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData) as UserFormData;
+        return {
+          name: parsedData.name || "",
+          email: parsedData.email || "",
+          age: parsedData.age || 20,
+          gender: parsedData.gender || "",
+          education_level: parsedData.education_level || "",
+          social_media_usage: parsedData.social_media_usage || 5,
+          main_platform: parsedData.main_platform || "",
+          sleep_hours_per_night: parsedData.sleep_hours_per_night || 8,
+          relationship_status: parsedData.relationship_status || "",
+          conflicts_over_social_media:
+            parsedData.conflicts_over_social_media || 1,
+          country: parsedData.country || "",
+        };
+      } catch (error) {
+        console.error("Error al cargar datos del localStorage:", error);
+      }
+    }
+    // Datos por defecto si no hay nada en localStorage
+    return {
+      name: "",
+      email: "",
+      age: 20,
+      gender: "",
+      education_level: "",
+      social_media_usage: 5,
+      main_platform: "",
+      sleep_hours_per_night: 8,
+      relationship_status: "",
+      conflicts_over_social_media: 1,
+      country: "",
+    };
+  };
+
+  const [formData, setFormData] = useState<UserFormData>(
+    loadFormDataFromStorage()
+  );
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasExistingData, setHasExistingData] = useState(false);
 
   const handleInputChange = (
     field: keyof UserFormData,
     value: string | number
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const updatedFormData = { ...formData, [field]: value };
+    setFormData(updatedFormData);
+
+    // Guardar automáticamente en localStorage cada vez que se actualice un campo
+    localStorage.setItem("userFormData", JSON.stringify(updatedFormData));
+
     if (errors[field]) {
       const newErrors = { ...errors };
       delete newErrors[field];
@@ -135,6 +172,28 @@ export function FormPage() {
       setIsSubmitting(false);
     }
   };
+
+  // Función para limpiar datos guardados
+  const handleClearData = () => {
+    const defaultData: UserFormData = {
+      name: "",
+      email: "",
+      age: 20,
+      gender: "",
+      education_level: "",
+      social_media_usage: 5,
+      main_platform: "",
+      sleep_hours_per_night: 8,
+      relationship_status: "",
+      conflicts_over_social_media: 1,
+      country: "",
+    };
+
+    setFormData(defaultData);
+    localStorage.removeItem("userFormData");
+    setHasExistingData(false);
+    setErrors({});
+  };
   // Cargar opciones de catálogos
   const [countries, setCountries] = useState<SelectForm[]>();
   const [educationLevels, setEducationLevels] = useState<SelectForm[]>();
@@ -168,6 +227,12 @@ export function FormPage() {
   };
   useEffect(() => {
     loadCatalogs();
+
+    // Verificar si hay datos existentes en localStorage
+    const storedData = localStorage.getItem("userFormData");
+    if (storedData) {
+      setHasExistingData(true);
+    }
   }, []);
 
   return (
@@ -194,6 +259,43 @@ export function FormPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {/* Mensaje informativo si hay datos existentes */}
+            {hasExistingData && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className="bg-blue-500 rounded-full p-1">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-blue-800 font-medium">
+                    Se han cargado tus datos guardados anteriormente
+                  </p>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-blue-600 text-sm">
+                    Puedes modificar cualquier campo y los cambios se guardarán
+                    automáticamente.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleClearData}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Limpiar datos
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Información Personal */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* <div>
