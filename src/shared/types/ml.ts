@@ -43,7 +43,7 @@ export interface ScatterDataPoint {
   x: number;
   y: number;
   z?: number;
-  cluster: number;
+  cluster?: number;
   label?: string;
 }
 
@@ -54,12 +54,14 @@ export interface TreeNode {
 
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "image" | "tree";
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "image" | "tree" | "linear";
   data: ChartDataPoint[] | ScatterDataPoint[] | TreeNode | string | undefined;
   width?: number;
   height?: number;
   xAxisLabel?: string;
   yAxisLabel?: string;
+  regressionLine?: { slope: number; intercept: number };
+
 }
 
 export interface ModelMetrics {

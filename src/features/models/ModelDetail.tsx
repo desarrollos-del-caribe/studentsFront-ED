@@ -23,6 +23,17 @@ interface TreeVisualizationResponse {
   target: string;
   tree_text: string;
 }
+interface SleepPredictionResponse {
+  predicted_sleep_hours_per_night: number;
+  dataset_stats: {
+    avg_social_media_usage: number;
+    avg_sleep_hours_per_night: number;
+  };
+  message: string;
+  sleep_classification: string;
+  scatter_points?: ScatterDataPoint[];
+  regression_line?: { slope: number; intercept: number };
+}
 import ModelData from "./ModelData";
 
 export default function ModelDetail() {
@@ -49,27 +60,39 @@ export default function ModelDetail() {
       switch (model.name) {
         case "Regresión Lineal": {
           async function fetchData() {
-            const response1 = formData
-              ? await Models.PostSleepPrediction(formData) : [undefined, undefined];
+            const response = formData
+              ? await Models.PostSleepPrediction(formData)
+              : undefined;
 
-            if (response1 ) {
+            if (response) {
               setHaveData(true);
-              console.log("Sleep Prediction:", response1);
+              console.log("Sleep Prediction:", response);
+              const scatterPoints: ScatterDataPoint[] =
+                response.scatter_points || [
+                  { x: 1, y: 8.5 },
+                  { x: 2, y: 8.2 },
+                  { x: 3, y: 7.8 },
+                  { x: 4, y: 7.5 },
+                  { x: 5, y: 7.0 },
+                  { x: 6, y: 6.8 },
+                  { x: 7, y: 6.5 },
+                  { x: 8, y: 6.2 },
+                  { x: 9, y: 5.8 },
+                  { x: 10, y: 5.5 },
+                ];
+              const regressionLine =
+                response.regression_line || { slope: -0.3, intercept: 9.0 };
+
               const visualizations: ModelVisualizationData[] = [
                 {
-                  title: "Predicción de Horas de Sueño",
-                  type: "bar",
-                  data: [
-                    {
-                      label: "Horas Predichas",
-                      value: response1.predicted_sleep_hours,
-                      color: "#4CAF50",
-                    },
-                  ],
-                  width: 400,
-                  height: 300,
-                  xAxisLabel: "Métrica",
-                  yAxisLabel: "Horas",
+                  title: "Regresión Lineal: Uso de Redes vs Sueño",
+                  type: "linear",
+                  data: scatterPoints,
+                  regressionLine: regressionLine,
+                  width: 600,
+                  height: 400,
+                  xAxisLabel: "Horas de Uso de Redes Sociales",
+                  yAxisLabel: "Horas de Sueño por Noche",
                 },
               ];
               setVisualizations(visualizations);
