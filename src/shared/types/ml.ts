@@ -2,57 +2,14 @@ export interface UserFormData {
   name: string;
   email: string;
   age: number;
-  gender: "Masculino" | "Femenino" | "Otro";
-  education_level: "Bachillerato" | "Universidad" | "Posgrado";
+  gender: string;
+  education_level: string;
   social_media_usage: number;
-  main_platform:
-    | "Instagram"
-    | "TikTok"
-    | "Facebook"
-    | "Twitter"
-    | "YouTube"
-    | "LinkedIn";
+  main_platform: string;
   sleep_hours_per_night: number;
-  relationship_status: "Soltero" | "En una relacion" | "Casado" | "Complicado";
+  relationship_status: string;
   conflicts_over_social_media: number;
-  country:
-    | "Afghanistan"
-    | "Albania"
-    | "Algeria"
-    | "Antigua y Barbuda"
-    | "Argentina"
-    | "Armenia"
-    | "Austria"
-    | "Bahrain"
-    | "Bangladesh"
-    | "Belize"
-    | "Bhutan"
-    | "Bolivia"
-    | "Brazil"
-    | "Canada"
-    | "Chile"
-    | "China"
-    | "Colombia"
-    | "Ecuador"
-    | "El salvador"
-    | "España"
-    | "Estados Unidos"
-    | "Germany"
-    | "Guatemala"
-    | "India"
-    | "Italy"
-    | "Japan"
-    | "Liechtenstein"
-    | "Malta"
-    | "Mexico"
-    | "North Korea"
-    | "Peru"
-    | "Qatar"
-    | "Ukraine"
-    | "Venezuela"
-    | "Vietnam"
-    | "Zimbabue"
-    | "Otro";
+  country: string;
 }
 export interface SelectForm{
   value: string;

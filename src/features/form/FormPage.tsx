@@ -16,14 +16,14 @@ export function FormPage() {
     name: "",
     email: "",
     age: 20,
-    gender: "Masculino",
-    education_level: "Universidad",
+    gender: "",
+    education_level: "",
     social_media_usage: 5,
-    main_platform: "Instagram",
+    main_platform: "",
     sleep_hours_per_night: 8,
-    relationship_status: "Soltero",
+    relationship_status: "",
     conflicts_over_social_media: 1,
-    country: "Mexico",
+    country: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
