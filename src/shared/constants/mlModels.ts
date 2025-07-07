@@ -3,10 +3,10 @@ import type { MLModel } from "../types/ml";
 export const ML_MODELS: MLModel[] = [
   {
     id: 1,
-    name: "Regresión Lineal",
-    algorithm: "Linear Regression",
-    description:
-      "Predice el rendimiento académico basado en el uso de redes sociales, horas de estudio y edad.",
+    name: 'Regresión Lineal',
+    icon: 'linear-regression',
+    algorithm: 'Linear Regression',
+    description: 'Predice el rendimiento académico basado en el uso de redes sociales, horas de estudio y edad.',
     accuracy: 85,
     use_cases: "Predicción continua, análisis de tendencias",
     use_cases_list: ["Predicción continua", "análisis de tendencias"],
@@ -16,10 +16,10 @@ export const ML_MODELS: MLModel[] = [
   },
   {
     id: 2,
-    name: "Regresión Logística",
-    algorithm: "Logistic Regression",
-    description:
-      "Clasifica el riesgo académico en categorías: Alto, Medio y Bajo.",
+    name: 'Regresión Logística',
+    icon: 'logistic-regression',
+    algorithm: 'Logistic Regression',
+    description: 'Clasifica el riesgo académico en categorías: Alto, Medio y Bajo.',
     accuracy: 82,
     use_cases: "Clasificación binaria, análisis de riesgo",
     use_cases_list: ["Clasificación binaria", "análisis de riesgo"],
@@ -29,10 +29,10 @@ export const ML_MODELS: MLModel[] = [
   },
   {
     id: 3,
-    name: "K-Means Clustering",
-    algorithm: "K-Means",
-    description:
-      "Agrupa usuarios con patrones similares de comportamiento en redes sociales.",
+    name: 'K-Means Clustering',
+    icon: 'k-means',
+    algorithm: 'K-Means',
+    description: 'Agrupa usuarios con patrones similares de comportamiento en redes sociales.',
     accuracy: 78,
     use_cases: "Segmentación de usuarios, análisis de grupos",
     use_cases_list: ["Segmentación de usuarios", "análisis de grupos"],
@@ -42,10 +42,10 @@ export const ML_MODELS: MLModel[] = [
   },
   {
     id: 4,
-    name: "Random Forest",
-    algorithm: "Random Forest",
-    description:
-      "Predicción robusta del rendimiento académico usando múltiples árboles de decisión.",
+    name: 'Random Forest',
+    icon: 'random-forest',
+    algorithm: 'Random Forest',
+    description: 'Predicción robusta del rendimiento académico usando múltiples árboles de decisión.',
     accuracy: 89,
     use_cases: "Predicción compleja, análisis de importancia",
     use_cases_list: ["Predicción compleja", "análisis de importancia"],
@@ -55,10 +55,10 @@ export const ML_MODELS: MLModel[] = [
   },
   {
     id: 5,
-    name: "Árboles de Decisión",
-    algorithm: "Decision Tree",
-    description:
-      "Genera reglas interpretables para identificar factores de riesgo académico.",
+    name: 'Árboles de Decisión',
+    icon: 'decision-tree',
+    algorithm: 'Decision Tree',
+    description: 'Genera reglas interpretables para identificar factores de riesgo académico.',
     accuracy: 76,
     use_cases: "Reglas de negocio, interpretabilidad",
     use_cases_list: ["Reglas de negocio", "interpretabilidad"],
@@ -68,10 +68,10 @@ export const ML_MODELS: MLModel[] = [
   },
   {
     id: 6,
-    name: "Support Vector Machine",
-    algorithm: "SVM",
-    description:
-      "Clasificación avanzada de patrones de uso problemático en redes sociales.",
+    name: 'Support Vector Machine',
+    icon: 'svm',
+    algorithm: 'SVM',
+    description: 'Clasificación avanzada de patrones de uso problemático en redes sociales.',
     accuracy: 84,
     use_cases: "Clasificación compleja, detección de patrones",
     use_cases_list: ["Clasificación compleja", "detección de patrones"],
