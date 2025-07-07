@@ -1,1 +1,1 @@
-export * from './useAsync'
+export * from './useD3';

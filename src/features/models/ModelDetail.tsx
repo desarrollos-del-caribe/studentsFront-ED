@@ -6,13 +6,28 @@ import ModelNoData from "./ModelNoData";
 import { RenderIcon } from "../../shared/components";
 import ModelLock from "./ModelLock";
 import * as Models from "../../shared/services/model.services";
-import type { UserFormData } from "../../shared/types/ml";
+import type {
+  UserFormData,
+  ModelVisualizationData,
+  ScatterDataPoint,
+} from "../../shared/types/ml";
+
+interface KMeansResponse {
+  clusters: number;
+  features_data: string[];
+  label: string;
+  points: ScatterDataPoint[];
+}
+import ModelData from "./ModelData";
 
 export default function ModelDetail() {
   const { modelId } = useParams<{ modelId: string }>();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const model = ML_MODELS.find((m) => m.id === parseInt(modelId || "0"));
   const [haveData, setHaveData] = useState<boolean>(false);
+  const [visualizations, setVisualizations] = useState<
+    ModelVisualizationData[]
+  >([]);
 
   useEffect(() => {
     if (localStorage.getItem("formCompleted") === "true") {
@@ -79,7 +94,38 @@ export default function ModelDetail() {
 
             if (response) {
               setHaveData(true);
-              console.log("K-Means:", response);
+              const kmeanResponse = response as KMeansResponse;
+              console.log("K-Means Response:", kmeanResponse);
+
+              const kmeansVisualizaciones: ModelVisualizationData[] = [
+                {
+                  title: "Distribución de Clusters",
+                  type: "scatter",
+                  data:
+                    kmeanResponse.points ||
+                    ([
+                      // Datos de muestra con coordenadas 3D
+                      { x: 2.5, y: 3.1, z: 1.8, cluster: 0 },
+                      { x: 1.8, y: 2.9, z: 2.2, cluster: 0 },
+                      { x: 2.2, y: 3.3, z: 1.5, cluster: 0 },
+                      { x: 5.1, y: 4.8, z: 3.9, cluster: 1 },
+                      { x: 4.9, y: 5.2, z: 4.1, cluster: 1 },
+                      { x: 5.3, y: 4.6, z: 3.7, cluster: 1 },
+                      { x: 8.2, y: 1.1, z: 6.8, cluster: 2 },
+                      { x: 7.9, y: 1.4, z: 6.5, cluster: 2 },
+                      { x: 8.5, y: 0.9, z: 7.1, cluster: 2 },
+                      { x: 3.1, y: 6.8, z: 2.9, cluster: 3 },
+                      { x: 2.8, y: 7.1, z: 3.2, cluster: 3 },
+                      { x: 3.4, y: 6.5, z: 2.7, cluster: 3 },
+                    ] as ScatterDataPoint[]),
+                  width: 800,
+                  height: 600,
+                  xAxisLabel: "Componente Principal 1",
+                  yAxisLabel: "Componente Principal 2",
+                },
+              ];
+
+              setVisualizations(kmeansVisualizaciones);
             } else {
               setHaveData(false);
             }
@@ -176,6 +222,12 @@ export default function ModelDetail() {
             </div>
 
             {!haveData && <ModelNoData />}
+            {haveData && (
+              <ModelData
+                visualizations={visualizations}
+                title={model?.name || "Modelo"}
+              />
+            )}
           </div>
         </div>
       )}

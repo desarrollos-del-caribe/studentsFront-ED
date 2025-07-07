@@ -71,3 +71,41 @@ export interface MLModel {
   unlock_condition: string;
   created_at: string;
 }
+
+export interface ChartDataPoint {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+export interface ScatterDataPoint {
+  x: number;
+  y: number;
+  z?: number;
+  cluster: number;
+  label?: string;
+}
+
+export interface ModelVisualizationData {
+  title: string;
+  type: "bar" | "line" | "pie" | "scatter" | "histogram";
+  data: ChartDataPoint[] | ScatterDataPoint[];
+  width?: number;
+  height?: number;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+}
+
+export interface ModelMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+}
+
+export interface ModelPerformanceData {
+  metrics: ModelMetrics;
+  confusionMatrix?: number[][];
+  featureImportance?: ChartDataPoint[];
+  predictionDistribution?: ChartDataPoint[];
+}
