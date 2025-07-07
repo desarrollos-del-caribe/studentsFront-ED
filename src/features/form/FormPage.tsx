@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Save, ArrowRight } from "lucide-react";
 import type { UserFormData } from "../../shared/types/ml";
-import { FORM_OPTIONS } from "../../shared/constants/mlModels";
 import { Button } from "../../shared/components/Button";
-import { GetCountry,
+import {
+  GetCountry,
   GetAcademicLevel,
   GetMostUsedPlatform,
   GetRelationshipStatus,
-  GetGender } from "../../shared/services/catalogs.services";
-import type {  SelectForm } from "../../shared/types/ml";
+  GetGender,
+} from "../../shared/services/catalogs.services";
+import type { SelectForm } from "../../shared/types/ml";
 export function FormPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<UserFormData>({
@@ -138,16 +139,23 @@ export function FormPage() {
   const [countries, setCountries] = useState<SelectForm[]>();
   const [educationLevels, setEducationLevels] = useState<SelectForm[]>();
   const [mostUsedPlatforms, setMostUsedPlatforms] = useState<SelectForm[]>();
-  const [relationshipStatuses, setRelationshipStatuses] = useState<SelectForm[]>();
+  const [relationshipStatuses, setRelationshipStatuses] =
+    useState<SelectForm[]>();
   const [genders, setGenders] = useState<SelectForm[]>();
   const loadCatalogs = async () => {
     try {
-      const [countriesData, educationLevelsData, mostUsedPlatformsData, relationshipStatusesData, gendersData] = await Promise.all([
+      const [
+        countriesData,
+        educationLevelsData,
+        mostUsedPlatformsData,
+        relationshipStatusesData,
+        gendersData,
+      ] = await Promise.all([
         GetCountry(),
         GetAcademicLevel(),
         GetMostUsedPlatform(),
         GetRelationshipStatus(),
-        GetGender()
+        GetGender(),
       ]);
       setCountries(countriesData);
       setEducationLevels(educationLevelsData);

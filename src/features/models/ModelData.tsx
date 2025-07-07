@@ -8,9 +8,7 @@ import {
   LineChart,
   PieChart,
   ScatterPlot,
-  
 } from "./charts";
-import LinearRegressionChart from "./charts/LinearRegressionChart";
 
 interface ModelDataProps {
   visualizations?: ModelVisualizationData[];
@@ -18,14 +16,11 @@ interface ModelDataProps {
 }
 
 const isScatterData = (
-  data: ChartDataPoint[] | ScatterDataPoint[],
-  chartType: string
+  data: ChartDataPoint[] | ScatterDataPoint[]
 ): data is ScatterDataPoint[] => {
-  if (!Array.isArray(data) || data.length === 0) return false;
-  const hasXY = "x" in data[0] && "y" in data[0];
-  // For 'scatter' type (K-Means), require 'cluster'; for 'linear', it's optional
-  const hasCluster = "cluster" in data[0];
-  return chartType === "linear" ? hasXY : hasXY && hasCluster;
+  return (
+    data.length > 0 && "x" in data[0] && "y" in data[0] && "cluster" in data[0]
+  );
 };
 
 // Función helper para verificar si es K-Means
@@ -41,10 +36,9 @@ export default function ModelData({
   title = "Datos del Modelo",
 }: ModelDataProps) {
   const renderChart = (visualization: ModelVisualizationData) => {
-    console.log("Rendering chart for visualization:", visualization);
     switch (visualization.type) {
       case "bar":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (isScatterData(visualization.data)) {
           return <div>Tipo de datos incompatible para gráfico de barras</div>;
         }
         return (
@@ -58,7 +52,7 @@ export default function ModelData({
           />
         );
       case "line":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (isScatterData(visualization.data)) {
           return <div>Tipo de datos incompatible para gráfico de líneas</div>;
         }
         return (
@@ -72,7 +66,7 @@ export default function ModelData({
           />
         );
       case "pie":
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (isScatterData(visualization.data)) {
           return <div>Tipo de datos incompatible para gráfico circular</div>;
         }
         return (
@@ -84,7 +78,8 @@ export default function ModelData({
           />
         );
       case "scatter":
-        if (!isScatterData(visualization.data, visualization.type)) {
+        console.log("Rendering scatter plot with data:", visualization);
+        if (!isScatterData(visualization.data)) {
           return <div>Tipo de datos incompatible para scatter plot</div>;
         }
         return (
@@ -115,7 +110,8 @@ export default function ModelData({
           />
         );
       case "histogram":
-        if (isScatterData(visualization.data, visualization.type)) {
+        // Podrías implementar Histogram más tarde
+        if (isScatterData(visualization.data)) {
           return <div>Tipo de datos incompatible para histograma</div>;
         }
         return (
@@ -128,8 +124,10 @@ export default function ModelData({
             yAxisLabel={visualization.yAxisLabel}
           />
         );
+
+
       default:
-        if (isScatterData(visualization.data, visualization.type)) {
+        if (isScatterData(visualization.data)) {
           return <div>Tipo de gráfico no soportado</div>;
         }
         return (
@@ -145,24 +143,11 @@ export default function ModelData({
     }
   };
 
-  if (visualizations.length === 0) {
-    return (
-      <div className="p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">{title}</h2>
-        <div className="text-center py-8">
-          <p className="text-gray-500 text-lg">No hay datos para mostrar</p>
-          <p className="text-gray-400 text-sm mt-2">
-            Pasa datos de visualización al componente para ver gráficos
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
-      <div className="grid gap-6">
+
+      <div className="gridgap-6">
         {visualizations.map((visualization, index) => (
           <div key={index} className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold mb-3 text-gray-700">
