@@ -39,15 +39,15 @@ export function FormPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "El nombre es requerido";
-    }
+    // if (!formData.name.trim()) {
+    //   newErrors.name = "El nombre es requerido";
+    // }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "El email es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email inválido";
-    }
+    // if (!formData.email.trim()) {
+    //   newErrors.email = "El email es requerido";
+    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    //   newErrors.email = "Email inválido";
+    // }
 
     if (formData.age < 16 || formData.age > 65) {
       newErrors.age = "Edad debe estar entre 16 y 65 años";
@@ -156,7 +156,7 @@ export function FormPage() {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
             {/* Información Personal */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nombre Completo *
                 </label>
@@ -172,9 +172,9 @@ export function FormPage() {
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
                 )}
-              </div>
+              </div> */}
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email *
                 </label>
@@ -190,7 +190,7 @@ export function FormPage() {
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
