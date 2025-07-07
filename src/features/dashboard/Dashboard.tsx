@@ -15,13 +15,8 @@ import { Button } from "../../shared/components/Button";
 
 export function Dashboard() {
   const formCompleted = localStorage.getItem("formCompleted") === "true";
-
-  const availableModels = ML_MODELS.filter(
-    (model) => !model.is_locked || formCompleted
-  );
-  const lockedModels = ML_MODELS.filter(
-    (model) => model.is_locked && !formCompleted
-  );
+  const availableModels = formCompleted ? ML_MODELS : [];
+  const lockedModels: typeof ML_MODELS = formCompleted ? [] : ML_MODELS;
 
   const getModelIcon = (algorithm: string) => {
     switch (algorithm) {
@@ -103,50 +98,46 @@ export function Dashboard() {
               {availableModels.map((model) => {
                 const IconComponent = getModelIcon(model.algorithm);
                 return (
-                  <Link
-                    key={model.id}
-                    to={`/models/${model.id}`}
-                    className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border hover:border-blue-300"
-                  >
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="bg-blue-100 p-3 rounded-lg group-hover:bg-blue-200 transition-colors">
-                          <IconComponent className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                          {model.accuracy}% precisión
-                        </span>
+                  <div className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border hover:border-blue-300 p-6 ">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="bg-blue-100 p-3 rounded-lg group-hover:bg-blue-200 transition-colors">
+                        <IconComponent className="h-6 w-6 text-blue-600" />
                       </div>
+                      <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        {model.accuracy}% precisión
+                      </span>
+                    </div>
 
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {model.name}
-                      </h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                      {model.name}
+                    </h3>
 
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                        {model.description}
-                      </p>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {model.description}
+                    </p>
 
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {model.use_cases_list.map((useCase, index) => (
-                          <span
-                            key={index}
-                            className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
-                          >
-                            {useCase}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500">
-                          {model.algorithm}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {model.use_cases_list.map((useCase, index) => (
+                        <span
+                          key={index}
+                          className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
+                        >
+                          {useCase}
                         </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        {model.algorithm}
+                      </span>
+                      <Link key={model.id} to={`/models/${model.id}`}>
                         <span className="text-blue-600 font-medium text-sm group-hover:text-blue-700">
                           Explorar →
                         </span>
-                      </div>
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>

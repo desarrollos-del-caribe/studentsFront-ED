@@ -4,6 +4,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 1,
     name: 'Regresión Lineal',
+    icon: 'linear-regression',
     algorithm: 'Linear Regression',
     description: 'Predice el rendimiento académico basado en el uso de redes sociales, horas de estudio y edad.',
     accuracy: 85,
@@ -16,6 +17,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 2,
     name: 'Regresión Logística',
+    icon: 'logistic-regression',
     algorithm: 'Logistic Regression',
     description: 'Clasifica el riesgo académico en categorías: Alto, Medio y Bajo.',
     accuracy: 82,
@@ -28,6 +30,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 3,
     name: 'K-Means Clustering',
+    icon: 'k-means',
     algorithm: 'K-Means',
     description: 'Agrupa usuarios con patrones similares de comportamiento en redes sociales.',
     accuracy: 78,
@@ -40,6 +43,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 4,
     name: 'Random Forest',
+    icon: 'random-forest',
     algorithm: 'Random Forest',
     description: 'Predicción robusta del rendimiento académico usando múltiples árboles de decisión.',
     accuracy: 89,
@@ -52,6 +56,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 5,
     name: 'Árboles de Decisión',
+    icon: 'decision-tree',
     algorithm: 'Decision Tree',
     description: 'Genera reglas interpretables para identificar factores de riesgo académico.',
     accuracy: 76,
@@ -64,6 +69,7 @@ export const ML_MODELS: MLModel[] = [
   {
     id: 6,
     name: 'Support Vector Machine',
+    icon: 'svm',
     algorithm: 'SVM',
     description: 'Clasificación avanzada de patrones de uso problemático en redes sociales.',
     accuracy: 84,
