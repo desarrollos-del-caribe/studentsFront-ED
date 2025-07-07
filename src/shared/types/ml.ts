@@ -55,7 +55,7 @@ export interface TreeNode {
 
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear";
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear" | "svm";
   data: ChartDataPoint[] | ScatterDataPoint[] | string;
   width?: number;
   height?: number;

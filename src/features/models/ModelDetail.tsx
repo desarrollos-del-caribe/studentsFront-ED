@@ -404,6 +404,65 @@ export default function ModelDetail() {
           fetchData();
           break;
         }
+        case "Support Vector Machine": {
+          async function fetchData() {
+            const [response1, response2] = formData
+              ? await Promise.all([
+                  Models.PostAcademicImpactPrediction(formData),
+                  Models.PostAcademicRiskPrediction(formData),
+                ])
+              : [undefined, undefined];
+      
+            if (response1 || response2) {
+              setHaveData(true);
+              console.log("Academic Impact:", response1);
+              console.log("Academic Risk:", response2);
+              const visualizations: ModelVisualizationData[] = [];
+      
+              // Visualización para predict_academic_impact (SVM)
+              if (response1 && response1.dataset_points && response1.user_point) {
+                visualizations.push({
+                  title: "Impacto Académico: SVM",
+                  type: "svm",
+                  data: {
+                    datasetPoints: response1.dataset_points,
+                    userPoint: response1.user_point,
+                  },
+                  width: 600,
+                  height: 400,
+                  xAxisLabel: "Horas de Uso de Redes Sociales",
+                  yAxisLabel: "Horas de Sueño por Noche",
+                });
+              }
+      
+              // Visualización para academic_performance_risk
+              if (response2) {
+                visualizations.push({
+                  title: "Riesgo Académico",
+                  type: "bar",
+                  data: [
+                    {
+                      label: response2.risk,
+                      value: response2.probability * 100,
+                      color: response2.risk === "Alto" ? "#F44336" : "#4CAF50",
+                    },
+                  ],
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Riesgo",
+                  yAxisLabel: "Probabilidad (%)",
+                });
+              }
+      
+              setVisualizations(visualizations);
+            } else {
+              setHaveData(false);
+            }
+          }
+      
+          fetchData();
+          break;
+        }
 
         default:
           setHaveData(false);
