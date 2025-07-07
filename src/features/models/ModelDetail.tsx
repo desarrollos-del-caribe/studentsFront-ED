@@ -18,6 +18,11 @@ interface KMeansResponse {
   label: string;
   points: ScatterDataPoint[];
 }
+interface TreeVisualizationResponse {
+  label: string;
+  target: string;
+  tree_text: string;
+}
 import ModelData from "./ModelData";
 
 export default function ModelDetail() {
@@ -44,17 +49,30 @@ export default function ModelDetail() {
       switch (model.name) {
         case "Regresión Lineal": {
           async function fetchData() {
-            const [response1, response2] = formData
-              ? await Promise.all([
-                  Models.PostMentalScorePrediction(formData),
-                  Models.PostSleepPrediction(formData),
-                ])
-              : [undefined, undefined];
+            const response1 = formData
+              ? await Models.PostSleepPrediction(formData) : [undefined, undefined];
 
-            if (response1 || response2) {
+            if (response1 ) {
               setHaveData(true);
-              console.log("Mental Score:", response1);
-              console.log("Sleep Prediction:", response2);
+              console.log("Sleep Prediction:", response1);
+              const visualizations: ModelVisualizationData[] = [
+                {
+                  title: "Predicción de Horas de Sueño",
+                  type: "bar",
+                  data: [
+                    {
+                      label: "Horas Predichas",
+                      value: response1.predicted_sleep_hours,
+                      color: "#4CAF50",
+                    },
+                  ],
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Métrica",
+                  yAxisLabel: "Horas",
+                },
+              ];
+              setVisualizations(visualizations);
             } else {
               setHaveData(false);
             }
@@ -77,6 +95,42 @@ export default function ModelDetail() {
               setHaveData(true);
               console.log("Academic Impact:", response1);
               console.log("Academic Risk:", response2);
+              const visualizations: ModelVisualizationData[] = [];
+              if (response1) {
+                visualizations.push({
+                  title: "Impacto Académico",
+                  type: "bar",
+                  data: [
+                    {
+                      label: response1.impact,
+                      value: response1.probability * 100,
+                      color: "#2196F3",
+                    },
+                  ],
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Impacto",
+                  yAxisLabel: "Probabilidad (%)",
+                });
+              }
+              if (response2) {
+                visualizations.push({
+                  title: "Riesgo Académico",
+                  type: response2.graph_url ? "image" : "bar",
+                  data: response2.graph_url || [
+                    {
+                      label: response2.risk,
+                      value: response2.probability * 100,
+                      color: "#F44336",
+                    },
+                  ],
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Riesgo",
+                  yAxisLabel: "Probabilidad (%)",
+                });
+              }
+              setVisualizations(visualizations);
             } else {
               setHaveData(false);
             }
@@ -144,6 +198,22 @@ export default function ModelDetail() {
             if (response) {
               setHaveData(true);
               console.log("Social Media Addiction Risk:", response);
+              const visualizations: ModelVisualizationData[] = [
+                {
+                  title: "Riesgo de Adicción a Redes Sociales",
+                  type: response.graph_url ? "image" : "pie",
+                  data: response.graph_url || [
+                    { label: "Bajo", value: response.probabilities[0] * 100, color: "#4CAF50" },
+                    { label: "Medio", value: response.probabilities[1] * 100, color: "#FFC107" },
+                    { label: "Alto", value: response.probabilities[2] * 100, color: "#F44336" },
+                  ],
+                  width: 400,
+                  height: 300,
+                  xAxisLabel: "Nivel de Riesgo",
+                  yAxisLabel: "Probabilidad (%)",
+                },
+              ];
+              setVisualizations(visualizations);
             } else {
               setHaveData(false);
             }

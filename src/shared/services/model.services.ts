@@ -49,3 +49,9 @@ export const GetDescriptiveStatistics = async (data: UserFormData) => {
   const response = await genericRequest.GetUrl(`${BASE_URL}/models/addiction-by-country`, data);
   return response;
 };
+
+// Rendimiento Estudiantil
+export const GetStudentPerformance = async (studentId: string) => {
+  const response = await genericRequest.GetUrl(`${BASE_URL}/models/student-performance/${studentId}`);
+  return response;
+};

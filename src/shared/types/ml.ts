@@ -10,11 +10,15 @@ export interface UserFormData {
   relationship_status: string;
   conflicts_over_social_media: number;
   country: string;
+  mental_health_score?: number;
+  addicted_score?: number;
 }
-export interface SelectForm{
+
+export interface SelectForm {
   value: string;
   label: string;
 }
+
 export interface MLModel {
   id: number;
   name: string;
@@ -43,10 +47,15 @@ export interface ScatterDataPoint {
   label?: string;
 }
 
+export interface TreeNode {
+  name: string;
+  children?: TreeNode[];
+}
+
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram";
-  data: ChartDataPoint[] | ScatterDataPoint[];
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "image" | "tree";
+  data: ChartDataPoint[] | ScatterDataPoint[] | TreeNode | string | undefined;
   width?: number;
   height?: number;
   xAxisLabel?: string;
