@@ -10,7 +10,6 @@ import type {
   UserFormData,
   ModelVisualizationData,
   ScatterDataPoint,
-  TreeNode,
 } from "../../shared/types/ml";
 
 interface KMeansResponse {
@@ -19,11 +18,13 @@ interface KMeansResponse {
   label: string;
   points: ScatterDataPoint[];
 }
+
 interface TreeVisualizationResponse {
   label: string;
   target: string;
   tree_text: string;
 }
+
 interface SleepPredictionResponse {
   predicted_sleep_hours_per_night: number;
   dataset_stats: {
@@ -34,6 +35,18 @@ interface SleepPredictionResponse {
   sleep_classification: string;
   scatter_points?: ScatterDataPoint[];
   regression_line?: { slope: number; intercept: number };
+}
+
+interface AcademicResponse {
+  impact?: string;
+  risk?: string;
+  probability: number;
+  graph_url?: string;
+}
+
+interface SocialMediaResponse {
+  probabilities: number[];
+  graph_url?: string;
 }
 import ModelData from "./ModelData";
 
@@ -65,11 +78,15 @@ export default function ModelDetail() {
               ? await Models.PostSleepPrediction(formData)
               : undefined;
 
-            if (response) {
+            const sleepResponse = response as
+              | SleepPredictionResponse
+              | undefined;
+
+            if (sleepResponse) {
               setHaveData(true);
-              console.log("Sleep Prediction:", response);
+              console.log("Sleep Prediction:", sleepResponse);
               const scatterPoints: ScatterDataPoint[] =
-                response.scatter_points || [
+                sleepResponse.scatter_points || [
                   { x: 1, y: 8.5 },
                   { x: 2, y: 8.2 },
                   { x: 3, y: 7.8 },
@@ -81,11 +98,9 @@ export default function ModelDetail() {
                   { x: 9, y: 5.8 },
                   { x: 10, y: 5.5 },
                 ];
-              const regressionLine =
-                response.regression_line || { slope: -0.3, intercept: 9.0 };
               const userPoint: ScatterDataPoint = {
                 x: formData?.social_media_usage || 5,
-                y: response.predicted_sleep_hours_per_night,
+                y: sleepResponse.predicted_sleep_hours_per_night,
                 label: "Tu Predicción",
               };
 
@@ -94,7 +109,10 @@ export default function ModelDetail() {
                   title: "Regresión Lineal: Uso de Redes vs Sueño",
                   type: "linear",
                   data: [...scatterPoints, userPoint],
-                  regressionLine: regressionLine,
+                  regressionLine: sleepResponse.regression_line || {
+                    slope: -0.3,
+                    intercept: 9.0,
+                  },
                   width: 600,
                   height: 400,
                   xAxisLabel: "Horas de Uso de Redes Sociales",
@@ -120,19 +138,23 @@ export default function ModelDetail() {
                 ])
               : [undefined, undefined];
 
-            if (response1 || response2) {
+            const academicImpact = response1 as AcademicResponse | undefined;
+            const academicRisk = response2 as AcademicResponse | undefined;
+
+            if (academicImpact || academicRisk) {
               setHaveData(true);
-              console.log("Academic Impact:", response1);
-              console.log("Academic Risk:", response2);
+              console.log("Academic Impact:", academicImpact);
+              console.log("Academic Risk:", academicRisk);
               const visualizations: ModelVisualizationData[] = [];
-              if (response1) {
+
+              if (academicImpact) {
                 visualizations.push({
                   title: "Impacto Académico",
                   type: "bar",
                   data: [
                     {
-                      label: response1.impact,
-                      value: response1.probability * 100,
+                      label: academicImpact.impact || "Sin impacto",
+                      value: academicImpact.probability * 100,
                       color: "#2196F3",
                     },
                   ],
@@ -142,14 +164,15 @@ export default function ModelDetail() {
                   yAxisLabel: "Probabilidad (%)",
                 });
               }
-              if (response2) {
+
+              if (academicRisk) {
                 visualizations.push({
                   title: "Riesgo Académico",
-                  type: response2.graph_url ? "image" : "bar",
-                  data: response2.graph_url || [
+                  type: "bar",
+                  data: [
                     {
-                      label: response2.risk,
-                      value: response2.probability * 100,
+                      label: academicRisk.risk || "Sin riesgo",
+                      value: academicRisk.probability * 100,
                       color: "#F44336",
                     },
                   ],
@@ -208,17 +231,33 @@ export default function ModelDetail() {
               ? await Models.PostSocialMediaAddictionRiskPrediction(formData)
               : undefined;
 
-            if (response) {
+            const socialMediaResponse = response as
+              | SocialMediaResponse
+              | undefined;
+
+            if (socialMediaResponse) {
               setHaveData(true);
-              console.log("Social Media Addiction Risk:", response);
+              console.log("Social Media Addiction Risk:", socialMediaResponse);
               const visualizations: ModelVisualizationData[] = [
                 {
                   title: "Riesgo de Adicción a Redes Sociales",
-                  type: response.graph_url ? "image" : "pie",
-                  data: response.graph_url || [
-                    { label: "Bajo", value: response.probabilities[0] * 100, color: "#4CAF50" },
-                    { label: "Medio", value: response.probabilities[1] * 100, color: "#FFC107" },
-                    { label: "Alto", value: response.probabilities[2] * 100, color: "#F44336" },
+                  type: "pie",
+                  data: [
+                    {
+                      label: "Bajo",
+                      value: socialMediaResponse.probabilities[0] * 100,
+                      color: "#4CAF50",
+                    },
+                    {
+                      label: "Medio",
+                      value: socialMediaResponse.probabilities[1] * 100,
+                      color: "#FFC107",
+                    },
+                    {
+                      label: "Alto",
+                      value: socialMediaResponse.probabilities[2] * 100,
+                      color: "#F44336",
+                    },
                   ],
                   width: 400,
                   height: 300,
@@ -242,15 +281,17 @@ export default function ModelDetail() {
               ? await Models.GetTreeVisualizationPrediction(formData)
               : undefined;
 
-            const responseCast = response as TreeNode | undefined;
+            const treeResponse = response as
+              | TreeVisualizationResponse
+              | undefined;
 
-            if (response && responseCast?.tree_text) {
+            if (treeResponse && treeResponse.tree_text) {
               setHaveData(true);
               const treeVisualizations: ModelVisualizationData[] = [
                 {
                   title: "Árbol de Decisión",
                   type: "tree",
-                  data: responseCast.tree_text,
+                  data: treeResponse.tree_text,
                   width: 800,
                   height: 600,
                 },

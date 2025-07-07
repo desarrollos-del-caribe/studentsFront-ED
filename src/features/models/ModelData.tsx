@@ -3,7 +3,13 @@ import type {
   ScatterDataPoint,
   ChartDataPoint,
 } from "../../shared/types/ml";
-import { BarChart, LineChart, PieChart, ScatterPlot } from "./charts";
+import {
+  BarChart,
+  LineChart,
+  PieChart,
+  ScatterPlot,
+  LinearRegressionChart,
+} from "./charts";
 import { DecisionTree } from "./charts/DecisionTree";
 
 interface ModelDataProps {
@@ -76,6 +82,30 @@ export default function ModelData({
             data={visualization.data}
             width={visualization.width || 400}
             height={visualization.height || 400}
+          />
+        );
+      case "linear":
+        console.log(
+          "Rendering linear regression chart with data:",
+          visualization
+        );
+        if (
+          typeof visualization.data === "string" ||
+          !Array.isArray(visualization.data) ||
+          !visualization.regressionLine
+        ) {
+          return <div>Tipo de datos incompatible para regresión lineal</div>;
+        }
+        return (
+          <LinearRegressionChart
+            key={visualization.title}
+            data={visualization.data as ScatterDataPoint[]}
+            regressionLine={visualization.regressionLine}
+            width={visualization.width || 600}
+            height={visualization.height || 400}
+            xAxisLabel={visualization.xAxisLabel}
+            yAxisLabel={visualization.yAxisLabel}
+            title={visualization.title}
           />
         );
       case "scatter":
