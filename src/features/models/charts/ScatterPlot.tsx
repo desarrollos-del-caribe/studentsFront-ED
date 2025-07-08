@@ -15,6 +15,7 @@ interface ScatterPlotProps {
   xAxisLabel?: string;
   yAxisLabel?: string;
   title?: string;
+  isClusteringModel?: boolean; // Nueva prop para identificar si es clustering
 }
 
 export function ScatterPlot({
@@ -24,7 +25,26 @@ export function ScatterPlot({
   xAxisLabel = "X",
   yAxisLabel = "Y",
   title = "Scatter Plot",
+  isClusteringModel = false,
 }: ScatterPlotProps) {
+  // Función para obtener la etiqueta del cluster
+  const getClusterLabel = (cluster: number) => {
+    if (isClusteringModel) {
+      switch (cluster) {
+        case 0:
+          return "Uso Mínimo";
+        case 1:
+          return "Uso Medio";
+        case 2:
+          return "Uso Excesivo";
+        default:
+          return `Cluster ${cluster}`;
+      }
+    } else {
+      return cluster === 0 ? "No Afecta" : "Afecta";
+    }
+  };
+
   const ref = useD3(
     (svg) => {
       // Limpiar contenido previo
@@ -167,8 +187,8 @@ export function ScatterPlot({
 
           const tooltipContent =
             d.label === "Tu Predicción"
-              ? `<div><strong>${d.label}</strong><br/><strong>Uso de Redes:</strong> ${d.x}h<br/><strong>Horas de Sueño:</strong> ${d.y}h<br/><strong>Clasificación:</strong> ${d.cluster === 0 ? "No Afecta" : "Afecta"}</div>`
-              : `<div><strong>Clasificación:</strong> ${d.cluster === 0 ? "No Afecta" : "Afecta"}<br/><strong>${xAxisLabel}:</strong> ${d.x.toFixed(1)}<br/><strong>${yAxisLabel}:</strong> ${d.y.toFixed(1)}</div>`;
+              ? `<div><strong>${d.label}</strong><br/><strong>Uso de Redes:</strong> ${d.x}h<br/><strong>Horas de Sueño:</strong> ${d.y}h<br/><strong>Clasificación:</strong> ${getClusterLabel(d.cluster)}</div>`
+              : `<div><strong>Clasificación:</strong> ${getClusterLabel(d.cluster)}<br/><strong>${xAxisLabel}:</strong> ${d.x.toFixed(1)}<br/><strong>${yAxisLabel}:</strong> ${d.y.toFixed(1)}</div>`;
 
           tooltip.style("visibility", "visible").html(tooltipContent);
         })
@@ -193,13 +213,22 @@ export function ScatterPlot({
         .attr("transform", `translate(${innerWidth + 20}, 20)`);
 
       // Crear elementos de leyenda para los clusters
-      const legendData = [
-        { cluster: 0, label: "No Afecta", color: "#10b981" },
-        { cluster: 1, label: "Afecta", color: "#ef4444" },
-        ...(data.some((d) => d.label === "Tu Predicción")
-          ? [{ cluster: -1, label: "Tu Predicción", color: "#fbbf24" }]
-          : []),
-      ];
+      const legendData = isClusteringModel
+        ? [
+            { cluster: 0, label: "Uso Mínimo", color: "#10b981" },
+            { cluster: 1, label: "Uso Medio", color: "#ef4444" },
+            { cluster: 2, label: "Uso Excesivo", color: "#3b82f6" },
+            ...(data.some((d) => d.label === "Tu Predicción")
+              ? [{ cluster: -1, label: "Tu Predicción", color: "#fbbf24" }]
+              : []),
+          ]
+        : [
+            { cluster: 0, label: "No Afecta", color: "#10b981" },
+            { cluster: 1, label: "Afecta", color: "#ef4444" },
+            ...(data.some((d) => d.label === "Tu Predicción")
+              ? [{ cluster: -1, label: "Tu Predicción", color: "#fbbf24" }]
+              : []),
+          ];
 
       const legendItems = legend
         .selectAll(".legend-item")

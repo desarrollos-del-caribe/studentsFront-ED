@@ -62,6 +62,7 @@ export interface ModelVisualizationData {
   regressionLine?: { slope: number; intercept: number };
   description?: string;
   additionalInfo?: string;
+  isClusteringModel?: boolean; // Nueva propiedad para identificar modelos de clustering
 }
 
 export interface ModelMetrics {
@@ -76,4 +77,21 @@ export interface ModelPerformanceData {
   confusionMatrix?: number[][];
   featureImportance?: ChartDataPoint[];
   predictionDistribution?: ChartDataPoint[];
+}
+
+export interface UserAnalysisResponse {
+  addicted_score: number;
+  mental_health_score: number;
+  affects_academic_performance: number;
+  classifications: {
+    mental_health: string;
+    addiction: string;
+    sleep: string;
+    academic_impact: string;
+    platform: string;
+    usage: string;
+    conflicts: string;
+  };
+  recommendations: string[];
+  risk_factors: string[];
 }

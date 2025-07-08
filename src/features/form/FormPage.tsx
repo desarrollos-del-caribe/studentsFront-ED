@@ -80,8 +80,8 @@ export function FormPage() {
       newErrors.age = "Edad debe estar entre 16 y 65 años";
     }
 
-    if (formData.social_media_usage < 1 || formData.social_media_usage > 10) {
-      newErrors.social_media_usage = "Debe estar entre 1 y 10 horas";
+    if (formData.social_media_usage < 1 || formData.social_media_usage > 24) {
+      newErrors.social_media_usage = "Debe estar entre 1 y 24 horas";
     }
 
     if (
@@ -99,7 +99,7 @@ export function FormPage() {
       formData.social_media_usage === undefined ||
       isNaN(formData.social_media_usage) ||
       formData.social_media_usage < 1 ||
-      formData.social_media_usage > 10
+      formData.social_media_usage > 24
     ) {
       newErrors.social_media_usage = "El campo es requerido";
     }
@@ -208,6 +208,7 @@ export function FormPage() {
       console.error("Error al cargar catálogos:", error);
     }
   };
+
   useEffect(() => {
     loadCatalogs();
 
@@ -417,7 +418,7 @@ export function FormPage() {
                 <input
                   type="number"
                   min="1"
-                  max="10"
+                  max="24"
                   step="0.5"
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.social_media_usage
@@ -432,7 +433,7 @@ export function FormPage() {
                     )
                   }
                 />
-                <p className="text-gray-500 text-xs mt-1">Entre 1 y 10 horas</p>
+                <p className="text-gray-500 text-xs mt-1">Entre 1 y 24 horas</p>
                 {errors.social_media_usage && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.social_media_usage}

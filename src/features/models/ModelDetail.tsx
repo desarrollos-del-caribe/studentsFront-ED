@@ -10,6 +10,7 @@ import type {
   UserFormData,
   ModelVisualizationData,
   ScatterDataPoint,
+  UserAnalysisResponse,
 } from "../../shared/types/ml";
 
 interface KMeansResponse {
@@ -78,6 +79,39 @@ export default function ModelDetail() {
   const [visualizations, setVisualizations] = useState<
     ModelVisualizationData[]
   >([]);
+  const [userAnalysis, setUserAnalysis] = useState<UserAnalysisResponse | null>(
+    null
+  );
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
+  // Función para cargar análisis de usuario
+  const loadUserAnalysis = async (userData: UserFormData) => {
+    // Verificar que todos los campos necesarios estén completos
+    if (
+      !userData.age ||
+      !userData.gender ||
+      !userData.education_level ||
+      !userData.social_media_usage ||
+      !userData.main_platform ||
+      !userData.sleep_hours_per_night ||
+      !userData.relationship_status ||
+      userData.conflicts_over_social_media === undefined ||
+      !userData.country
+    ) {
+      return; // No cargar análisis si faltan datos
+    }
+
+    setLoadingAnalysis(true);
+    try {
+      const analysisResponse = await Models.PostAnalyzeUser(userData);
+      setUserAnalysis(analysisResponse as UserAnalysisResponse);
+    } catch (error) {
+      console.error("Error al cargar análisis:", error);
+      setUserAnalysis(null);
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
 
   useEffect(() => {
     if (localStorage.getItem("formCompleted") === "true") {
@@ -87,6 +121,11 @@ export default function ModelDetail() {
     const formData = storedData
       ? (JSON.parse(storedData) as UserFormData)
       : null;
+
+    // Cargar análisis si hay datos del formulario
+    if (formData) {
+      loadUserAnalysis(formData);
+    }
 
     if (!model) {
       console.error("Modelo no encontrado:", modelId);
@@ -285,8 +324,9 @@ export default function ModelDetail() {
                   data: kmeanResponse.points,
                   width: 800,
                   height: 600,
-                  xAxisLabel: "Componente Principal 1",
-                  yAxisLabel: "Componente Principal 2",
+                  xAxisLabel: "Horas de Uso de Redes Sociales",
+                  yAxisLabel: "Horas de Sueño por Noche",
+                  isClusteringModel: true, // Indicar que es un modelo de clustering
                 },
               ];
 
@@ -406,60 +446,96 @@ export default function ModelDetail() {
         }
         case "Support Vector Machine": {
           async function fetchData() {
-            const [response1, response2] = formData
-              ? await Promise.all([
-                  Models.PostAcademicImpactPrediction(formData),
-                  Models.PostAcademicRiskPrediction(formData),
-                ])
-              : [undefined, undefined];
-      
-            if (response1 || response2) {
+            const response = formData
+              ? await Models.PostAcademicImpactPrediction(formData)
+              : undefined;
+
+            const academicImpact = response as AcademicResponse | undefined;
+
+            if (academicImpact) {
               setHaveData(true);
-              console.log("Academic Impact:", response1);
-              console.log("Academic Risk:", response2);
+              console.log("SVM Academic Impact:", academicImpact);
               const visualizations: ModelVisualizationData[] = [];
-      
-              // Visualización para predict_academic_impact (SVM)
-              if (response1 && response1.dataset_points && response1.user_point) {
+
+              // Si hay dataset_points, crear visualización con puntos de SVM
+              if (academicImpact.dataset_points && academicImpact.user_point) {
+                // Separar puntos por etiqueta para SVM
+                const noAffectsPoints = academicImpact.dataset_points
+                  .filter((point) => point.label === 0)
+                  .map((point) => ({
+                    x: point.x,
+                    y: point.y,
+                    cluster: 0,
+                    label: "No Afecta",
+                  }));
+
+                const affectsPoints = academicImpact.dataset_points
+                  .filter((point) => point.label === 1)
+                  .map((point) => ({
+                    x: point.x,
+                    y: point.y,
+                    cluster: 1,
+                    label: "Afecta",
+                  }));
+
+                // Punto del usuario
+                const userPoint = {
+                  x: academicImpact.user_point.x,
+                  y: academicImpact.user_point.y,
+                  cluster: academicImpact.affects_academic_performance || 0,
+                  label: "Tu Predicción",
+                };
+
+                const allPoints = [
+                  ...noAffectsPoints,
+                  ...affectsPoints,
+                  userPoint,
+                ];
+
                 visualizations.push({
-                  title: "Impacto Académico: SVM",
-                  type: "svm",
-                  data: {
-                    datasetPoints: response1.dataset_points,
-                    userPoint: response1.user_point,
-                  },
-                  width: 600,
-                  height: 400,
+                  title:
+                    "Support Vector Machine: Clasificación de Impacto Académico",
+                  type: "scatter",
+                  data: allPoints,
+                  width: 700,
+                  height: 500,
                   xAxisLabel: "Horas de Uso de Redes Sociales",
                   yAxisLabel: "Horas de Sueño por Noche",
+                  description:
+                    "SVM encuentra el hiperplano óptimo que mejor separa las clases, maximizando el margen entre ellas.",
+                  additionalInfo: `Predicción SVM: ${
+                    academicImpact.affects_academic_performance === 0
+                      ? "No afecta tu rendimiento académico"
+                      : "Podría afectar tu rendimiento académico"
+                  } (${(academicImpact.probability * 100).toFixed(1)}% confianza)`,
                 });
-              }
-      
-              // Visualización para academic_performance_risk
-              if (response2) {
+              } else {
+                // Visualización de barras si no hay dataset_points
                 visualizations.push({
-                  title: "Riesgo Académico",
+                  title: "Support Vector Machine: Impacto Académico",
                   type: "bar",
                   data: [
                     {
-                      label: response2.risk,
-                      value: response2.probability * 100,
-                      color: response2.risk === "Alto" ? "#F44336" : "#4CAF50",
+                      label: academicImpact.impact || "Impacto Evaluado",
+                      value: academicImpact.probability * 100,
+                      color: "#2196F3",
                     },
                   ],
                   width: 400,
                   height: 300,
-                  xAxisLabel: "Riesgo",
+                  xAxisLabel: "Impacto",
                   yAxisLabel: "Probabilidad (%)",
+                  description:
+                    "Análisis de impacto académico usando Support Vector Machine",
                 });
               }
-      
+
               setVisualizations(visualizations);
             } else {
               setHaveData(false);
             }
           }
-      
+
           fetchData();
           break;
         }
@@ -516,10 +592,22 @@ export default function ModelDetail() {
 
             {!haveData && <ModelNoData />}
             {haveData && (
-              <ModelData
-                visualizations={visualizations}
-                title={model?.name || "Modelo"}
-              />
+              <>
+                <ModelData
+                  visualizations={visualizations}
+                  title={model?.name || "Modelo"}
+                />
+
+                {/* Tarjeta de Recomendaciones */}
+                {loadingAnalysis && (
+                  <div className="bg-white rounded-xl shadow-lg p-8 text-center mt-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-600 mt-2">
+                      Cargando análisis personalizado...
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

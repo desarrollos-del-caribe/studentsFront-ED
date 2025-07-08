@@ -66,4 +66,17 @@ export const ML_MODELS: MLModel[] = [
     unlock_condition: "complete_form",
     created_at: new Date().toISOString(),
   },
+  {
+    id: 6,
+    name: 'Support Vector Machine',
+    icon: 'svm',
+    algorithm: 'SVM',
+    description: 'Clasificación avanzada de patrones de uso problemático en redes sociales.',
+    accuracy: 84,
+    use_cases: "Clasificación compleja, detección de patrones",
+    use_cases_list: ["Clasificación compleja", "detección de patrones"],
+    is_locked: true,
+    unlock_condition: "complete_form",
+    created_at: new Date().toISOString(),
+  },
 ];

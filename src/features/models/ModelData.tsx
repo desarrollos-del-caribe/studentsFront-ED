@@ -31,9 +31,21 @@ const isScatterData = (
 };
 
 const isLogisticOrSVMData = (
-  data: ChartDataPoint[] | ScatterDataPoint[] | string | { datasetPoints: ChartDataPoint[]; userPoint: { x: number; y: number } }
-): data is { datasetPoints: ChartDataPoint[]; userPoint: { x: number; y: number } } => {
-  return typeof data !== "string" && !Array.isArray(data) && "datasetPoints" in data && "userPoint" in data;
+  data:
+    | ChartDataPoint[]
+    | ScatterDataPoint[]
+    | string
+    | { datasetPoints: ChartDataPoint[]; userPoint: { x: number; y: number } }
+): data is {
+  datasetPoints: ChartDataPoint[];
+  userPoint: { x: number; y: number };
+} => {
+  return (
+    typeof data !== "string" &&
+    !Array.isArray(data) &&
+    "datasetPoints" in data &&
+    "userPoint" in data
+  );
 };
 
 export default function ModelData({
@@ -135,23 +147,24 @@ export default function ModelData({
             xAxisLabel={visualization.xAxisLabel}
             yAxisLabel={visualization.yAxisLabel}
             title={visualization.title}
+            isClusteringModel={visualization.isClusteringModel || false}
           />
         );
-        case "svm":
-          if (!isLogisticOrSVMData(visualization.data)) {
-            return <div>Tipo de datos incompatible para gráfico SVM</div>;
-          }
-          return (
-            <SVMChart
-              key={visualization.title}
-              datasetPoints={visualization.data.datasetPoints}
-              userPoint={visualization.data.userPoint}
-              width={visualization.width || 600}
-              height={visualization.height || 400}
-              xAxisLabel={visualization.xAxisLabel}
-              yAxisLabel={visualization.yAxisLabel}
-            />
-          );
+      case "svm":
+        if (!isLogisticOrSVMData(visualization.data)) {
+          return <div>Tipo de datos incompatible para gráfico SVM</div>;
+        }
+        return (
+          <SVMChart
+            key={visualization.title}
+            datasetPoints={visualization.data.datasetPoints}
+            userPoint={visualization.data.userPoint}
+            width={visualization.width || 600}
+            height={visualization.height || 400}
+            xAxisLabel={visualization.xAxisLabel}
+            yAxisLabel={visualization.yAxisLabel}
+          />
+        );
       case "tree":
         if (typeof visualization.data !== "string") {
           return <div>Tipo de datos incompatible para árbol de decisión</div>;
