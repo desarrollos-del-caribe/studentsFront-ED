@@ -53,7 +53,7 @@ export interface TreeNode {
 
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear" | "svm";
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear" | "svm" | "text";
   data: ChartDataPoint[] | ScatterDataPoint[] | string;
   width?: number;
   height?: number;
@@ -62,7 +62,9 @@ export interface ModelVisualizationData {
   regressionLine?: { slope: number; intercept: number };
   description?: string;
   additionalInfo?: string;
-  isClusteringModel?: boolean; // Nueva propiedad para identificar modelos de clustering
+  isClusteringModel?: boolean; 
+  recommendations?: Recommendation[];
+  message?: string;
 }
 
 export interface ModelMetrics {
@@ -94,4 +96,8 @@ export interface UserAnalysisResponse {
   };
   recommendations: string[];
   risk_factors: string[];
+}
+export interface Recommendation {
+  text: string;
+  severity: 'low' | 'medium' | 'high';
 }
