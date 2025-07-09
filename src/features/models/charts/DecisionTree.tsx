@@ -202,10 +202,10 @@ export const DecisionTree: React.FC<{ treeText: string }> = ({ treeText }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="bg-gray-50 rounded-lg p-8">
-        <div className="max-w-full overflow-x-auto">
-          <div className="min-w-max">
+        <div className="max-w-4xl overflow-x-auto">
+          <div className="min-w-max scale-80 transform transition-transform">
             <TreeNodeView node={tree} />
           </div>
         </div>

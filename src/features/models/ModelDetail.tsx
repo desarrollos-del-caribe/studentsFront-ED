@@ -12,66 +12,17 @@ import type {
   ScatterDataPoint,
   UserAnalysisResponse,
   Recommendation,
+  SocialMediaResponse,
+  KMeansResponse,
+  TreeResponse,
+  SleepPredictionResponse,
+  AcademicResponse,
 } from "../../shared/types/ml";
 
-interface KMeansResponse {
-  clusters: number;
-  recommendations?: string[];
-  features_data: string[];
-  label: string;
-  points: ScatterDataPoint[];
-  user_point: ScatterDataPoint;
-}
 
-interface TreeVisualizationResponse {
-  label: string;
-  target: string;
-  tree_text: string;
-}
 
-interface SleepPredictionResponse {
-  predicted_sleep_hours_per_night: number;
-  dataset_stats: {
-    avg_social_media_usage: number;
-    avg_sleep_hours_per_night: number;
-  };
-  message: string;
-  sleep_classification: string;
-  scatter_points?: ScatterDataPoint[];
-  regression_line?: { slope: number; intercept: number };
-}
 
-interface AcademicResponse {
-  impact?: string;
-  risk?: string;
-  probability: number;
-  graph_url?: string;
-  academic_impact_classification?: string;
-  affects_academic_performance?: number;
-  dataset_points?: Array<{
-    label: number;
-    x: number;
-    y: number;
-  }>;
-  user_point?: {
-    x: number;
-    y: number;
-  };
-}
 
-interface SocialMediaResponse {
-  probabilities: {
-    Adicción: number;
-    "No adicción": number;
-  };
-  risk: string;
-  graph_data?: {
-    label: string;
-    x: string[];
-    y: number[];
-  };
-  graph_url?: string;
-}
 import ModelData from "./ModelData";
 
 export default function ModelDetail() {
@@ -167,7 +118,7 @@ export default function ModelDetail() {
             };
            
 
-            const recommendations: Recommendation[] = sleepResponse.recommendations.map(rec => ({
+            const recommendations: Recommendation[] = sleepResponse.recommendations.map((rec: any) => ({
               text: rec,
               severity: sleepResponse.predicted_sleep_hours_per_night < 6 ? 'high' :
                         (sleepResponse.predicted_sleep_hours_per_night >= 6 && sleepResponse.predicted_sleep_hours_per_night < 8) ? 'medium' : 'low'
@@ -219,9 +170,7 @@ export default function ModelDetail() {
               const visualizations: ModelVisualizationData[] = [];
   
               if (academicImpact) {
-                // Si hay dataset_points, crear visualización con puntos
                 if (academicImpact.dataset_points && academicImpact.user_point) {
-                  // Separar puntos por etiqueta
                   const noAffectsPoints = academicImpact.dataset_points
                     .filter((point) => point.label === 0)
                     .map((point) => ({
@@ -240,7 +189,6 @@ export default function ModelDetail() {
                       label: 'Afecta',
                     }));
   
-                  // Punto del usuario
                   const userPoint = {
                     x: academicImpact.user_point.x,
                     y: academicImpact.user_point.y,
@@ -250,11 +198,9 @@ export default function ModelDetail() {
   
                   const allPoints = [...noAffectsPoints, ...affectsPoints, userPoint];
   
-                  // Asignar severidad basada en affects_academic_performance
                   const severity = academicImpact.affects_academic_performance === 0 ? 'low' : 'high';
   
-                  // Usar recomendaciones del endpoint y asignar severidad
-                  const recommendations: Recommendation[] = academicImpact.recommendations.map(rec => ({
+                  const recommendations: Recommendation[] = academicImpact.recommendations.map((rec: any) => ({
                     text: rec,
                     severity: severity,
                   }));
@@ -271,63 +217,13 @@ export default function ModelDetail() {
                       academicImpact.academic_impact_classification ||
                       'Análisis del impacto académico basado en patrones de uso de redes sociales y sueño.',
                     additionalInfo: `Predicción: ${academicImpact.affects_academic_performance === 0 ? 'No afecta tu rendimiento académico' : 'Podría afectar tu rendimiento académico'} (${(academicImpact.probability * 100).toFixed(1)}% confianza)`,
-                    message: academicImpact.academic_impact_classification, // Usar como mensaje
-                    recommendations, // Pasar recomendaciones del endpoint
+                    message: academicImpact.academic_impact_classification, 
+                    recommendations, 
                   });
-                } else {
-                  // Visualización de barras original si no hay dataset_points
-                  const severity = academicImpact.impact?.toLowerCase() === 'low' || !academicImpact.impact ? 'low' : 'high';
-                  const recommendations: Recommendation[] = academicImpact.recommendations.map(rec => ({
-                    text: rec,
-                    severity: severity,
-                  }));
-  
-                  visualizations.push({
-                    title: 'Impacto Académico',
-                    type: 'bar',
-                    data: [
-                      {
-                        label: academicImpact.impact || 'Sin impacto',
-                        value: academicImpact.probability * 100,
-                        color: '#2196F3',
-                      },
-                    ],
-                    width: 400,
-                    height: 300,
-                    xAxisLabel: 'Impacto',
-                    yAxisLabel: 'Probabilidad (%)',
-                    message: academicImpact.academic_impact_classification, // Usar como mensaje
-                    recommendations, // Pasar recomendaciones del endpoint
-                  });
-                }
+                } 
               }
   
-              if (academicRisk) {
-                // Asignar severidad basada en risk
-                const severity = academicRisk.risk?.toLowerCase() === 'low' || !academicRisk.risk ? 'low' : 'high';
-                const recommendations: Recommendation[] = academicRisk.recommendations.map(rec => ({
-                  text: rec,
-                  severity: severity,
-                }));
-  
-                visualizations.push({
-                  title: 'Riesgo Académico',
-                  type: 'bar',
-                  data: [
-                    {
-                      label: academicRisk.risk || 'Sin riesgo',
-                      value: academicRisk.probability * 100,
-                      color: '#F44336',
-                    },
-                  ],
-                  width: 400,
-                  height: 300,
-                  xAxisLabel: 'Riesgo',
-                  yAxisLabel: 'Probabilidad (%)',
-                  message: `Nivel de riesgo académico: ${academicRisk.risk || 'Sin riesgo'}`, // Mensaje personalizado
-                  recommendations, // Pasar recomendaciones del endpoint
-                });
-              }
+             
   
               setVisualizations(visualizations);
             } else {
@@ -341,46 +237,59 @@ export default function ModelDetail() {
 
         case "K-Means Clustering": {
           async function fetchData() {
-            const response = formData
-              ? await Models.GetKMeansClusteringPrediction(formData)
-              : undefined;
-        
-            if (response) {
-              setHaveData(true);
-              const kmeanResponse = response as KMeansResponse;
-              console.log("K-Means Response:", kmeanResponse);
-        
-              const userCluster = kmeanResponse.user_point.cluster;
-              const severity = userCluster === 0 ? 'low' : userCluster === 1 ? 'medium' : 'high';
-        
-              const recommendations: Recommendation[] = kmeanResponse.recommendations.map(rec => ({
-                text: rec,
-                severity: severity,
-              }));
-                
-              // Asegurar que user_point se incluya en los datos con label "Tu Predicción"
-              const userPointWithLabel = { ...kmeanResponse.user_point, label: 'Tu Predicción' };
-              const allPoints = [...kmeanResponse.points, userPointWithLabel];
-        
-              const kmeansVisualizaciones: ModelVisualizationData[] = [
-                {
-                  title: "Distribución de Clusters",
-                  type: "scatter",
-                  data: allPoints,
-                  width: 800,
-                  height: 600,
-                  xAxisLabel: "Horas de Uso de Redes Sociales",
-                  yAxisLabel: "Horas de Sueño por Noche",
-                  isClusteringModel: true, // Indicar que es un modelo de clustering
-                  message: kmeanResponse.label,
-                  recommendations,
-                  additionalInfo: `Tu punto está en el cluster ${userCluster}.`,
-                },
-              ];
-        
-              setVisualizations(kmeansVisualizaciones);
-            } else {
+            try {
+              setVisualizations([]);
               setHaveData(false);
+        
+              const response = formData ? await Models.GetKMeansClusteringPrediction(formData) : undefined;
+        
+              if (response && !response.error) {
+                setHaveData(true);
+                const kmeanResponse = response as KMeansResponse;
+                console.log("K-Means Response:", JSON.stringify(kmeanResponse, null, 2));
+        
+                const userCluster = kmeanResponse.user_point.cluster;
+                const severity = kmeanResponse.severity;
+        
+                const recommendations: Recommendation[] = kmeanResponse.recommendations.map((rec: string) => ({
+                  text: rec,
+                  severity: severity === "alto" ? "high" : severity === "moderado" ? "medium" : "low",
+                }));
+        
+                const userPointWithLabel = { ...kmeanResponse.user_point, label: "Tu Predicción" };
+                const allPoints = [...kmeanResponse.points, userPointWithLabel];
+        
+                const additionalInfo = userCluster != null && kmeanResponse.cluster_stats[userCluster]
+                  ? `Tu comportamiento está en el grupo ${userCluster}. Características promedio: ${Object.entries(kmeanResponse.cluster_stats[userCluster])
+                      .map(([k, v]) => `${k}: ${v.toFixed(1)}`)
+                      .join(", ")}.`
+                  : `Tu comportamiento está en el grupo ${userCluster || "desconocido"}.`;
+        
+                const kmeansVisualizaciones: ModelVisualizationData[] = [
+                  {
+                    title: "Distribución de Grupos de Comportamiento",
+                    type: "scatter",
+                    data: allPoints,
+                    width: 800,
+                    height: 600,
+                    xAxisLabel: "Edad (escalada)",
+                    yAxisLabel: "Horas de Uso de Redes Sociales (escalada)",
+                    isClusteringModel: true,
+                    message: kmeanResponse.label,
+                    recommendations,
+                    additionalInfo,
+                  },
+                ];
+        
+                console.log("K-Means Visualizations:", JSON.stringify(kmeansVisualizaciones, null, 2));
+                setVisualizations(kmeansVisualizaciones);
+              } else {
+                setHaveData(false);
+                console.error("Error en la respuesta:", response?.error || "Respuesta inválida");
+              }
+            } catch (error) {
+              setHaveData(false);
+              console.error("Error al obtener datos:", error);
             }
           }
         
@@ -390,139 +299,128 @@ export default function ModelDetail() {
 
         case "Random Forest": {
           async function fetchData() {
-            const response = formData
-              ? await Models.PostSocialMediaAddictionRiskPrediction(formData)
-              : undefined;
+            try {
+              setVisualizations([]);
+              setHaveData(false);
         
-            const socialMediaResponse = response as
-              | SocialMediaResponse
-              | undefined;
+              const response: SocialMediaResponse | undefined = formData
+                ? await Models.PostSocialMediaAddictionRiskPrediction(formData)
+                : undefined;
         
-            if (socialMediaResponse) {
-              setHaveData(true);
-              console.log("Social Media Addiction Risk:", socialMediaResponse);
+              if (response && !response.error) {
+                setHaveData(true);
+                console.log("Social Media Addiction Risk Response:", JSON.stringify(response, null, 2));
         
-              // Crear visualización basada en los datos de probabilidades
-              const addictionProbability =
-                socialMediaResponse.probabilities["Adicción"] * 100;
-              const noAddictionProbability =
-                socialMediaResponse.probabilities["No adicción"] * 100;
-              const socialMediaUsage = formData?.social_media_usage || 0; // Obtener uso de redes del formulario
+                const addictionProbability = response.probabilities["Adicción"] * 100;
+                const noAddictionProbability = response.probabilities["No adicción"] * 100;
+                const socialMediaUsage = formData?.social_media_usage || 0;
         
-              const visualizations: ModelVisualizationData[] = [
-                {
-                  title: `Riesgo de Adicción a Redes Sociales - Nivel: ${socialMediaResponse.risk}`,
-                  type: "pie",
-                  data: [
-                    {
-                      label: "No Adicción",
-                      value: noAddictionProbability,
-                      color: "#4CAF50",
-                    },
-                    {
-                      label: "Adicción",
-                      value: addictionProbability,
-                      color: "#F44336",
-                    },
-                  ],
-                  width: 400,
-                  height: 300,
-                  xAxisLabel: "Nivel de Riesgo",
-                  yAxisLabel: "Probabilidad (%)",
-                  description: `Basado en tus datos, el modelo predice un riesgo ${socialMediaResponse.risk.toLowerCase()} de adicción a redes sociales.`,
-                  additionalInfo: `Con un uso de ${socialMediaUsage} horas de redes sociales, tu probabilidad de riesgo es ${addictionProbability.toFixed(1)}% | Tu riesgo de ser adicto a la tecnología es ${socialMediaResponse.risk}`,
-                },
-              ];
-        
-              // Si hay datos de gráfico adicionales, agregar una visualización de barras
-              if (socialMediaResponse.graph_data) {
-                visualizations.push({
-                  title: socialMediaResponse.graph_data.label,
-                  type: "bar",
-                  data: socialMediaResponse.graph_data.x.map(
-                    (label, index) => ({
-                      label,
-                      value: socialMediaResponse.graph_data!.y[index] * 100,
-                      color: label === "Adicción" ? "#F44336" : "#4CAF50",
-                    })
-                  ),
-                  width: 400,
-                  height: 300,
-                  xAxisLabel: "Categoría",
-                  yAxisLabel: "Probabilidad (%)",
-                  additionalInfo: `Con un uso de ${socialMediaUsage} horas de redes sociales, tu probabilidad de riesgo es ${addictionProbability.toFixed(1)}% | Tu riesgo de ser adicto a la tecnología es ${socialMediaResponse.risk}`,
-                });
-              }
-        
-              // Usar recomendaciones del endpoint y asignar severidad basada en el risk
-              const severity = socialMediaResponse.risk.toLowerCase() === 'bajo' ? 'low' :
-                              socialMediaResponse.risk.toLowerCase() === 'medio' ? 'medium' : 'high';
-              const endpointRecommendations: Recommendation[] = socialMediaResponse.recommendations.map(rec => ({
-                text: rec,
-                severity: severity,
-              }));
-        
-              // Asignar recomendaciones del endpoint solo a la primera visualización (pie chart)
-              visualizations[0].recommendations = endpointRecommendations;
-        
-              // Asignar recomendaciones hardcodeadas específicas para la segunda visualización (barras) si existe
-              if (visualizations.length > 1) {
-                const hardcodedRecommendations: Recommendation[] = [
+                const visualizations: ModelVisualizationData[] = [
                   {
-                    text: `Con ${socialMediaUsage} horas de uso, considera reducir tu tiempo en redes sociales para bajar tu riesgo de ${addictionProbability.toFixed(1)}%.`,
-                    severity: severity,
-                  },
-                  {
-                    text: "Establece límites diarios para evitar un uso excesivo de tecnología.",
-                    severity: severity,
-                  },
-                  {
-                    text: "Busca actividades alternativas para equilibrar tu tiempo en línea.",
-                    severity: severity,
+                    title: `Riesgo de Adicción a Redes Sociales - Nivel: ${response.risk}`,
+                    type: "pie",
+                    data: [
+                      {
+                        label: "No Adicción",
+                        value: noAddictionProbability,
+                        color: "#4CAF50",
+                      },
+                      {
+                        label: "Adicción",
+                        value: addictionProbability,
+                        color: "#F44336",
+                      },
+                    ],
+                    width: 400,
+                    height: 300,
+                    xAxisLabel: "Nivel de Riesgo",
+                    yAxisLabel: "Probabilidad (%)",
+                    description: response.message,
+                    additionalInfo: `Con un uso de ${socialMediaUsage} horas de redes sociales, tu probabilidad de riesgo es ${addictionProbability.toFixed(1)}% | Tu riesgo de ser adicto a la tecnología es ${response.risk}`,
+                    recommendations: response.recommendations.map((rec: string) => ({
+                      text: rec,
+                      severity: response.risk.toLowerCase() === "bajo" ? "low" : "high",
+                    })),
                   },
                 ];
-                visualizations[1].recommendations = hardcodedRecommendations;
-              }
         
-              setVisualizations(visualizations);
-            } else {
+                if (response.graph_data?.labels && response.graph_data?.values) {
+                  visualizations.push({
+                    title: response.graph_data.label,
+                    type: "bar",
+                    data: response.graph_data.labels.map((label: string, index: number) => ({
+                      label,
+                      value: response.graph_data!.values[index] * 100,
+                      color: label === "Adicción" ? "#F44336" : "#4CAF50",
+                    })),
+                    width: 400,
+                    height: 300,
+                    xAxisLabel: "Categoría",
+                    yAxisLabel: "Probabilidad (%)",
+                    additionalInfo: `Con un uso de ${socialMediaUsage} horas de redes sociales, tu probabilidad de riesgo es ${addictionProbability.toFixed(1)}% | Tu riesgo de ser adicto a la tecnología es ${response.risk}`,
+                    recommendations: [], 
+                  });
+                }
+        
+                console.log("Visualizations set:", JSON.stringify(visualizations, null, 2));
+                setVisualizations(visualizations);
+              } else {
+                setHaveData(false);
+                console.error("Error en la respuesta:", response?.error || "Respuesta inválida");
+              }
+            } catch (error) {
               setHaveData(false);
+              console.error("Error al obtener datos:", error);
             }
           }
         
           fetchData();
           break;
         }
-
+        
         case "Árboles de Decisión": {
           async function fetchData() {
-            const response = formData
-              ? await Models.GetTreeVisualizationPrediction(formData)
-              : undefined;
-        
-            const treeResponse = response as
-              | TreeVisualizationResponse
-              | undefined;
-        
-            if (treeResponse && treeResponse.tree_text) {
-              setHaveData(true);
-              const treeVisualizations: ModelVisualizationData[] = [
-                {
-                  title: "Árbol de Decisión",
-                  type: "tree",
-                  data: treeResponse.tree_text,
-                  width: 800,
-                  height: 600,
-                  additionalInfo: `Este árbol predice el ${treeResponse.target} basado en tus datos. Analiza las ramas para identificar patrones de adicción.`, // Mensaje personalizado
-                  recommendations: treeResponse.recommendations.map(rec => ({
-                    text: rec,
-                    severity: 'low', // Severidad genérica, ajustable si el endpoint lo proporciona
-                  })),
-                },
-              ];
-              setVisualizations(treeVisualizations);
-            } else {
+            try {
+              setVisualizations([]);
               setHaveData(false);
+        
+              const response: TreeResponse | undefined = formData
+                ? await Models.GetTreeVisualizationPrediction(formData)
+                : undefined;
+        
+              if (response && !response.error && response.tree_text) {
+                setHaveData(true);
+                console.log("Tree Response:", JSON.stringify(response, null, 2));
+        
+                const recommendations: Recommendation[] = response.recommendations.map((rec: string) => ({
+                  text: rec,
+                  severity: response.severity === "alto" ? "high" : response.severity === "moderado" ? "medium" : "low",
+                }));
+        
+                const visualizations: ModelVisualizationData[] = [
+                  {
+                    title: "Análisis de Tus Hábitos",
+                    type: "tree",
+                    data: response.tree_text,
+                    width: 800,
+                    height: 600,
+                    message: response.label,
+                    recommendations,
+                    additionalInfo: response.prediction
+                      ? `Tu nivel de riesgo predicho es: ${response.prediction}`
+                      : "No se pudo determinar un nivel de riesgo.",
+                  },
+                ];
+        
+                console.log("Tree Visualizations:", JSON.stringify(visualizations, null, 2));
+                setVisualizations(visualizations);
+              } else {
+                setHaveData(false);
+                console.error("Error en la respuesta:", response?.error || "Respuesta inválida");
+              }
+            } catch (error) {
+              setHaveData(false);
+              console.error("Error al obtener datos:", error);
             }
           }
         
@@ -553,8 +451,8 @@ export default function ModelDetail() {
         
               // Punto del usuario basado en el formulario
               const userPoint: ScatterDataPoint = {
-                x: formData.social_media_usage,
-                y: formData.sleep_hours_per_night,
+                x: formData!.social_media_usage,
+                y: formData!.sleep_hours_per_night,
                 cluster: analysisResponse.affects_academic_performance || 0,
                 label: 'Tu Predicción',
               };
@@ -577,7 +475,7 @@ export default function ModelDetail() {
                   title: 'Impacto Académico',
                   type: 'text',
                   data: '', 
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.academic_impact,
                 },
@@ -585,7 +483,7 @@ export default function ModelDetail() {
                   title: 'Adicción',
                   type: 'text',
                   data: '',
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.addiction,
                 },
@@ -593,7 +491,7 @@ export default function ModelDetail() {
                   title: 'Conflictos',
                   type: 'text',
                   data: '',
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.conflicts,
                 },
@@ -601,23 +499,15 @@ export default function ModelDetail() {
                   title: 'Salud Mental',
                   type: 'text',
                   data: '',
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.mental_health,
-                },
-                {
-                  title: 'Plataforma',
-                  type: 'text',
-                  data: '',
-                  width: 300,
-                  height: 200,
-                  additionalInfo: analysisResponse.classifications.platform,
                 },
                 {
                   title: 'Sueño',
                   type: 'text',
                   data: '',
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.sleep,
                 },
@@ -625,7 +515,7 @@ export default function ModelDetail() {
                   title: 'Uso',
                   type: 'text',
                   data: '',
-                  width: 300,
+                  width: 400,
                   height: 200,
                   additionalInfo: analysisResponse.classifications.usage,
                 },

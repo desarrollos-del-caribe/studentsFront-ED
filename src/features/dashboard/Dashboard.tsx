@@ -98,7 +98,8 @@ export function Dashboard() {
               {availableModels.map((model) => {
                 const IconComponent = getModelIcon(model.algorithm);
                 return (
-                  <div className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border hover:border-blue-300 p-6 ">
+                  <div key={model.id}
+                    className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border hover:border-blue-300 p-6 ">
                     <div className="flex items-center justify-between mb-4">
                       <div className="bg-blue-100 p-3 rounded-lg group-hover:bg-blue-200 transition-colors">
                         <IconComponent className="h-6 w-6 text-blue-600" />

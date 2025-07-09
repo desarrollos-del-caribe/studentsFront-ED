@@ -14,7 +14,6 @@ import {
 import { DecisionTree } from "./charts/DecisionTree";
 import { SVMChart } from "./charts/SVMChart";
 import Recommendations from "./recommendations/Recommendations";
-import ReactMarkdown from "react-markdown";
 import { FaBrain, FaChartLine, FaClock, FaExclamationTriangle, FaHeart, FaMobileAlt, FaUsers } from "react-icons/fa";
 
 interface ModelDataProps {
@@ -23,13 +22,13 @@ interface ModelDataProps {
 }
 
 const cardStyles: { [key: string]: { color: string; icon: JSX.Element } } = {
-  'Impacto Académico': { color: 'bg-blue-100', icon: <FaBrain className="h-6 w-6 text-blue-600" /> },
-  'Adicción': { color: 'bg-red-100', icon: <FaExclamationTriangle className="h-6 w-6 text-red-600" /> },
-  'Conflictos': { color: 'bg-yellow-100', icon: <FaUsers className="h-6 w-6 text-yellow-600" /> },
-  'Salud Mental': { color: 'bg-purple-100', icon: <FaHeart className="h-6 w-6 text-purple-600" /> },
-  'Plataforma': { color: 'bg-green-100', icon: <FaMobileAlt className="h-6 w-6 text-green-600" /> },
-  'Sueño': { color: 'bg-indigo-100', icon: <FaClock className="h-6 w-6 text-indigo-600" /> },
-  'Uso': { color: 'bg-teal-100', icon: <FaChartLine className="h-6 w-6 text-teal-600" /> },
+  'Impacto Académico': { color: 'bg-blue-100', icon: <FaBrain className="h-10 w-10 text-blue-600" /> },
+  'Adicción': { color: 'bg-red-100', icon: <FaExclamationTriangle className="h-15 w-15 text-red-600" /> },
+  'Conflictos': { color: 'bg-yellow-100', icon: <FaUsers className="h-15 w-15 text-yellow-600" /> },
+  'Salud Mental': { color: 'bg-purple-100', icon: <FaHeart className="h-15 w-15 text-purple-600" /> },
+  'Plataforma': { color: 'bg-green-100', icon: <FaMobileAlt className="h-10 w-10 text-green-600" /> },
+  'Sueño': { color: 'bg-indigo-100', icon: <FaClock className="h-15 w-15 text-indigo-600" /> },
+  'Uso': { color: 'bg-teal-100', icon: <FaChartLine className="h-10 w-10 text-teal-600" /> },
 };
 
 const isScatterData = (
@@ -162,7 +161,7 @@ export default function ModelData({
                 ...point,
                 cluster: point.cluster ?? 0,
               }))}
-              userPoint={userPoint} // Pasar el user_point para resaltarlo
+              userPoint={userPoint} 
               width={visualization.width || 600}
               height={visualization.height || 400}
               xAxisLabel={visualization.xAxisLabel}
@@ -186,11 +185,20 @@ export default function ModelData({
             yAxisLabel={visualization.yAxisLabel}
           />
         );
-      case "tree":
-        if (typeof visualization.data !== "string") {
-          return <div>Tipo de datos incompatible para árbol de decisión</div>;
-        }
-        return <DecisionTree treeText={visualization.data} />;
+        case "tree":
+          if (typeof visualization.data !== "string" || !visualization.data.trim()) {
+            return (
+              <div className="p-6 bg-gray-100 rounded-lg shadow-lg text-center">
+                <div className="text-red-600 font-semibold text-lg mb-4">
+                  Error al mostrar el análisis
+                </div>
+                <div className="text-gray-600">
+                  Los datos del análisis no son válidos o están vacíos.
+                </div>
+              </div>
+            );
+          }
+          return <DecisionTree treeText={visualization.data} />;
       case "histogram":
         if (
           typeof visualization.data === "string" ||
@@ -211,7 +219,7 @@ export default function ModelData({
         case "text":
           return (
             <div
-              className={`p-4 rounded-lg flex items-start space-x-4 ${
+              className={`p-4 rounded-lg flex items-center space-x-7 ${
                 cardStyles[visualization.title]?.color || 'bg-gray-100'
               }`}
               style={{
@@ -250,30 +258,52 @@ export default function ModelData({
     }
   };
 
+  const textVisualizations = visualizations.filter(v => v.type === 'text');
+  const otherVisualizations = visualizations.filter(v => v.type !== 'text');
+
+  
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{title}</h2>
 
       <div className="grid gap-6">
-        {visualizations.map((visualization, index) => (
-          <div key={index} className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">
-              {visualization.title}
-            </h3>
+        {otherVisualizations.map((visualization, index) => (
+          <div key={index} className="p-4 rounded-lg">
             <div className="flex justify-center">
               {renderChart(visualization)}
             </div>
-            
-    {visualization.recommendations && visualization.recommendations.length > 0 && (
-      <Recommendations
-        message={visualization.message}
-        additionalInfo={visualization.additionalInfo}
-        recommendations={visualization.recommendations}
-      />
-    )}
+
+            {visualization.recommendations &&
+              visualization.recommendations.length > 0 && (
+                <Recommendations
+                  message={visualization.message}
+                  additionalInfo={visualization.additionalInfo}
+                  recommendations={visualization.recommendations}
+                />
+            )}
           </div>
         ))}
+
+        {textVisualizations.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+            {textVisualizations.map((visualization, index) => (
+              <div key={`text-${index}`} className="flex rounded-lg justify-center">
+                {renderChart(visualization)}
+
+                {visualization.recommendations &&
+                  visualization.recommendations.length > 0 && (
+                    <Recommendations
+                      message={visualization.message}
+                      additionalInfo={visualization.additionalInfo}
+                      recommendations={visualization.recommendations}
+                    />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
+  
 }
