@@ -1,12 +1,6 @@
 import { useD3 } from "../../../shared/hooks/useD3";
 import * as d3 from "d3";
-
-interface ScatterDataPoint {
-  x: number;
-  y: number;
-  cluster: number;
-  label?: string;
-}
+import type { ScatterDataPoint } from "../../../shared/types/ml";
 
 interface ScatterPlotProps {
   data: ScatterDataPoint[];
@@ -15,7 +9,8 @@ interface ScatterPlotProps {
   xAxisLabel?: string;
   yAxisLabel?: string;
   title?: string;
-  isClusteringModel?: boolean; // Nueva prop para identificar si es clustering
+  isClusteringModel?: boolean;
+  userPoint?: ScatterDataPoint; // Mantenemos como opcional
 }
 
 export function ScatterPlot({
@@ -187,8 +182,8 @@ export function ScatterPlot({
 
           const tooltipContent =
             d.label === "Tu Predicción"
-              ? `<div><strong>${d.label}</strong><br/><strong>Uso de Redes:</strong> ${d.x}h<br/><strong>Horas de Sueño:</strong> ${d.y}h<br/><strong>Clasificación:</strong> ${getClusterLabel(d.cluster)}</div>`
-              : `<div><strong>Clasificación:</strong> ${getClusterLabel(d.cluster)}<br/><strong>${xAxisLabel}:</strong> ${d.x.toFixed(1)}<br/><strong>${yAxisLabel}:</strong> ${d.y.toFixed(1)}</div>`;
+              ? `<div><strong>${d.label}</strong><br/><strong>Uso de Redes:</strong> ${d.x}h<br/><strong>Horas de Sueño:</strong> ${d.y}h<br/><strong>Clasificación:</strong> ${getClusterLabel(d.cluster!)}</div>`
+              : `<div><strong>Clasificación:</strong> ${getClusterLabel(d.cluster!)}<br/><strong>${xAxisLabel}:</strong> ${d.x.toFixed(1)}<br/><strong>${yAxisLabel}:</strong> ${d.y.toFixed(1)}</div>`;
 
           tooltip.style("visibility", "visible").html(tooltipContent);
         })
