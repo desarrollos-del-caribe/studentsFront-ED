@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import type { ChartDataPoint } from "../../../shared/types/ml";
-import { useD3 } from "../../../shared/hooks/useD3";
+import type { ChartDataPoint } from "../../shared/types/ml";
+import { useD3 } from "../../shared/hooks/useD3";
 
 interface PieChartProps {
   data: ChartDataPoint[];

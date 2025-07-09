@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
-import { Button } from "../../shared/components/Button";
+import { Button } from "../shared/components/Button";
 
 export default function ModelLock() {
   return (

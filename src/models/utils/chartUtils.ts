@@ -1,4 +1,4 @@
-import type { ModelVisualizationData, ChartDataPoint, ScatterDataPoint } from '../../../shared/types/ml';
+import type { ModelVisualizationData, ChartDataPoint, ScatterDataPoint } from '../../shared/types/ml';
 
 // Colores predefinidos para gráficos
 export const chartColors = [

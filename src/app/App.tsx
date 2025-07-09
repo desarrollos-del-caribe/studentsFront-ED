@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Landing } from "../features/landing";
 import { Dashboard } from "../features/dashboard";
 import { FormPage } from "../features/form";
-import ModelDetail from "../features/models/ModelDetail";
+import ModelDetail from "../models/ModelDetail";
 import { Navbar } from "../shared/components";
 
 export function App() {

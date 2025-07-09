@@ -1,8 +1,8 @@
 import * as d3 from "d3";
-import type { ChartDataPoint } from "../../../shared/types/ml";
-import { useD3 } from "../../../shared/hooks/useD3";
+import type { ChartDataPoint } from "../../shared/types/ml";
+import { useD3 } from "../../shared/hooks/useD3";
 
-interface LineChartProps {
+interface BarChartProps {
   data: ChartDataPoint[];
   width?: number;
   height?: number;
@@ -10,24 +10,25 @@ interface LineChartProps {
   yAxisLabel?: string;
 }
 
-export const LineChart = ({
+export const BarChart = ({
   data,
   width = 400,
   height = 300,
   xAxisLabel = "",
   yAxisLabel = "",
-}: LineChartProps) => {
+}: BarChartProps) => {
   const ref = useD3(
-    (svg: d3.Selection<SVGSVGElement, unknown, null, undefined>) => {
+    (svg) => {
       const margin = { top: 20, right: 30, bottom: 70, left: 60 };
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
       // Escalas
       const xScale = d3
-        .scalePoint()
+        .scaleBand()
         .domain(data.map((d) => d.label))
-        .range([0, innerWidth]);
+        .range([0, innerWidth])
+        .padding(0.1);
 
       const yScale = d3
         .scaleLinear()
@@ -41,33 +42,21 @@ export const LineChart = ({
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Línea
-      const line = d3
-        .line<ChartDataPoint>()
-        .x((d) => xScale(d.label) || 0)
-        .y((d) => yScale(d.value))
-        .curve(d3.curveMonotoneX);
-
-      g.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", "#3b82f6")
-        .attr("stroke-width", 2)
-        .attr("d", line);
-
-      // Puntos
-      g.selectAll(".dot")
+      // Barras
+      g.selectAll(".bar")
         .data(data)
         .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("cx", (d) => xScale(d.label) || 0)
-        .attr("cy", (d) => yScale(d.value))
-        .attr("r", 4)
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d) => xScale(d.label) || 0)
+        .attr("y", (d) => yScale(d.value))
+        .attr("width", xScale.bandwidth())
+        .attr("height", (d) => innerHeight - yScale(d.value))
         .attr("fill", (d) => d.color || "#3b82f6")
-        .on("mouseover", function (event: MouseEvent, d: ChartDataPoint) {
-          d3.select(this).attr("r", 6);
+        .on("mouseover", function (event, d) {
+          d3.select(this).attr("opacity", 0.7);
 
+          // Tooltip
           const tooltip = d3
             .select("body")
             .append("div")
@@ -87,7 +76,7 @@ export const LineChart = ({
             .style("top", event.pageY - 10 + "px");
         })
         .on("mouseout", function () {
-          d3.select(this).attr("r", 4);
+          d3.select(this).attr("opacity", 1);
           d3.selectAll(".tooltip").remove();
         });
 

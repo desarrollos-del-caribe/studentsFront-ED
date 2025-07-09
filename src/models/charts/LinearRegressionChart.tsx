@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
-import type { ScatterDataPoint } from '../../../shared/types/ml';
+import type { ScatterDataPoint } from '../../shared/types/ml';
 
 interface LinearRegressionChartProps {
   data: ScatterDataPoint[];

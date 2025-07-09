@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "../../shared/components/Button";
+import { Button } from "../shared/components/Button";
 export default function ModelUndefined() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

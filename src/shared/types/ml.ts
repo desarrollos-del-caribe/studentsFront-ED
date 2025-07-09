@@ -53,7 +53,7 @@ export interface TreeNode {
 
 export interface ModelVisualizationData {
   title: string;
-  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear";
+  type: "bar" | "line" | "pie" | "scatter" | "histogram" | "tree" | "linear" | "svm" | "text";
   data: ChartDataPoint[] | ScatterDataPoint[] | string;
   width?: number;
   height?: number;
@@ -62,6 +62,9 @@ export interface ModelVisualizationData {
   regressionLine?: { slope: number; intercept: number };
   description?: string;
   additionalInfo?: string;
+  isClusteringModel?: boolean; 
+  recommendations?: Recommendation[];
+  message?: string;
 }
 
 export interface ModelMetrics {
@@ -76,4 +79,25 @@ export interface ModelPerformanceData {
   confusionMatrix?: number[][];
   featureImportance?: ChartDataPoint[];
   predictionDistribution?: ChartDataPoint[];
+}
+
+export interface UserAnalysisResponse {
+  addicted_score: number;
+  mental_health_score: number;
+  affects_academic_performance: number;
+  classifications: {
+    mental_health: string;
+    addiction: string;
+    sleep: string;
+    academic_impact: string;
+    platform: string;
+    usage: string;
+    conflicts: string;
+  };
+  recommendations: string[];
+  risk_factors: string[];
+}
+export interface Recommendation {
+  text: string;
+  severity: 'low' | 'medium' | 'high';
 }

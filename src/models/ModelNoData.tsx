@@ -1,4 +1,4 @@
-import { RenderIcon } from "../../shared/components";
+import { RenderIcon } from "../shared/components";
 export default function ModelNoData() {
   return (
     <div className="max-w-6xl mx-auto">
