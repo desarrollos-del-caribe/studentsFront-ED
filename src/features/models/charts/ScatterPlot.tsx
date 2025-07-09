@@ -20,7 +20,7 @@ interface ScatterPlotProps {
 
 export function ScatterPlot({
   data,
-  width = 600,
+  width = 1000,
   height = 400,
   xAxisLabel = "X",
   yAxisLabel = "Y",
@@ -51,7 +51,7 @@ export function ScatterPlot({
       svg.selectAll("*").remove();
 
       // Configurar dimensiones y márgenes
-      const margin = { top: 40, right: 80, bottom: 60, left: 80 };
+      const margin = { top: 40, right: 120, bottom: 60, left: 80 };
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 

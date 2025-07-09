@@ -40,7 +40,7 @@ export const GetTreeVisualizationPrediction = async (data: UserFormData) => {
 
 // K-Means Clustering
 export const GetKMeansClusteringPrediction = async (data: UserFormData) => {
-  const response = await genericRequest.GetUrl(`${BASE_URL}/models/kmeans-clustering`, data);
+  const response = await genericRequest.PostUrl(`${BASE_URL}/models/kmeans-clustering`, data);
   return response;
 };
 
@@ -58,7 +58,7 @@ export const GetStudentPerformance = async (studentId: string) => {
 
 export const PostAnalyzeUser = async (data: UserFormData) => {
   const response = await genericRequest.PostUrl(
-    `${BASE_URL}/analyze-user`,
+    `${BASE_URL}/models/analyze-user`,
     data
   );
   return response;
